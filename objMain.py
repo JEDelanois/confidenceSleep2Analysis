@@ -40,8 +40,8 @@ Metrics.LoadData.loadClassMetric2(data)
 # DONT USE - this meeses up the order of simulations and can casue big problems
 # Metrics.Basics.getRankedConfidences(data, datsetName="task1TrainData", metricName="confidence")
 
-sleepStart = 0
-sleepEnd = 1
+sleepStart = 1
+sleepEnd = 2
 
 for datsetName in ["task1TrainData"]:
     for metricName in ["confidence", "classMetric2"]:
@@ -56,6 +56,18 @@ for datsetName in ["task1TrainData"]:
         Metrics.Basics.printRankedMetric(input, sortReverse=True, sortKey=lambda x: x[0], printNum=10, folderPath=data.figureFolderPath + "/figures/", fileName="%s-diff-%s.txt" % (datsetName, metricName))
 
         Metrics.Basics.plotMetric(data, datsetName=datsetName, metricName=metricName)
+
+
+datsetName = "task1TrainData"
+metricName  = "confidence" 
+bestSet = [sim for sim in data.sims if sim.trials[0].data.datasetMetrics[datsetName][metricName][sleepStart] > sim.trials[0].data.datasetMetrics[datsetName][metricName][0]]
+
+metricName  = "classMetric2"
+bestSet = [sim for sim in bestSet if sim.trials[0].data.datasetMetrics[datsetName][metricName][sleepStart] > sim.trials[0].data.datasetMetrics[datsetName][metricName][0]]
+
+input = [(sim.trials[0].data.datasetMetrics[datsetName]["classMetric2"][sleepStart] - sim.trials[0].data.datasetMetrics[datsetName]["classMetric2"][0], sim.trials[0].data.datasetMetrics[datsetName]["confidence"][sleepStart]- sim.trials[0].data.datasetMetrics[datsetName]["confidence"][0], sim.trials[0].path,) for sim in bestSet]
+Metrics.Basics.printRankedMetric(input, sortReverse=True, sortKey=lambda x: x[0], printNum=10, folderPath=data.figureFolderPath + "/figures/", fileName="%s-BestSimsBy-%s.txt" % (datsetName, metricName))
+
 
 data.saveFigures()
 

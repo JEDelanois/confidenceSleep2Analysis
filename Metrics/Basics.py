@@ -35,6 +35,10 @@ def printRankedMetric(input, sortReverse=False, sortKey=lambda x: x[0], printNum
         os.makedirs(folderPath)
 
     with open(os.path.join(folderPath, fileName), 'w') as outFile:
-        for i in range(printNum):
-            outFile.write('%s\n' % (str(input[i])))
+        if len(input) == 0: 
+            outFile.write("No items in input\nIf sorting was performed then probably no items fit criteria")
+
+        else:
+            for i in range(printNum):
+                outFile.write('%s\n' % (str(input[i])))
     
