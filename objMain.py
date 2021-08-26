@@ -20,71 +20,29 @@ from simData import *
 data = SimData(figureFolderPath="../figures/" )
 
 
-# data.createSimulationStructureFromPattern( \
-    # "../simulationSweep/HiddenClassesSleep//activationThresholds-[0.01, 0.01, 0.01, 0.5]_weightScales-[1, 5, 10]_delta1-0.0_delta2-0.0_delta3-0.0/".replace(" ","") \
-    # , "Sim 1 test" \
-    # ,[] \
-    # , range(0,1)) 
+data.createSimulationStructureFromPattern( \
+    "/bazhlab/edelanois/objectDetection/projects/objectDetection/8/simulations/sim1" \
+    , "Sim 1 test" \
+    ,[] \
+    , range(0,1)) 
 
-data.createSimulationStructureSweepFolder( \
-    "../simulationSweep/OLDHiddenClassesSleep/" \
-    , "Hidden Sleep" \
-    , titlePatternSameAsFilePattern=False)
+# data.createSimulationStructureSweepFolder( \
+    # "../simulationSweep/OLDHiddenClassesSleep/" \
+    # , "Hidden Sleep" \
+    # , titlePatternSameAsFilePattern=False)
 
 print(len(data.sims))
 Utils.ConfigUtil.loadConfigsForSimulations(data)
 
-Metrics.LoadData.loadConfidences(data)
-Metrics.LoadData.loadClassMetric2(data)
+# Metrics.LoadData.loadConfidences(data)
+# Metrics.LoadData.loadClassMetric2(data)
 
-# DONT USE - this meeses up the order of simulations and can casue big problems
-# Metrics.Basics.getRankedConfidences(data, datsetName="task1TrainData", metricName="confidence")
+metricNames = ["TP", "TN", "FP", "FN", "precision", "recall", "accuracy", "loss"] 
+metricFiles = ["TFPN/TP.txt", "TFPN/TN.txt", "TFPN/FP.txt", "TFPN/FN.txt", "TFPN/precision.txt", "TFPN/recall.txt", "accuracy.txt", "loss.txt"] 
+datasetNames = ["Training"]
 
-sleepStart = 1
-sleepEnd = 2
-
-for datsetName in ["task1TrainData"]:
-    for metricName in ["confidence", "classMetric2"]:
-
-        input = [(sim.trials[0].data.datasetMetrics[datsetName][metricName][sleepStart], sim.trials[0].path,) for sim in data.sims]
-        Metrics.Basics.printRankedMetric(input, sortReverse=True, sortKey=lambda x: x[0], printNum=10, folderPath=data.figureFolderPath + "/figures/", fileName="%s-first-%s.txt" % (datsetName, metricName))
-
-        input = [(sim.trials[0].data.datasetMetrics[datsetName][metricName][sleepStart], sim.trials[0].path,) for sim in data.sims]
-        Metrics.Basics.printRankedMetric(input, sortReverse=True, sortKey=lambda x: x[0], printNum=10, folderPath=data.figureFolderPath + "/figures/", fileName="%s-last-%s.txt" % (datsetName, metricName))
-
-        input = [(sim.trials[0].data.datasetMetrics[datsetName][metricName][sleepEnd]-sim.trials[0].data.datasetMetrics[datsetName][metricName][sleepStart], sim.trials[0].path,) for sim in data.sims]
-        Metrics.Basics.printRankedMetric(input, sortReverse=True, sortKey=lambda x: x[0], printNum=10, folderPath=data.figureFolderPath + "/figures/", fileName="%s-diff-%s.txt" % (datsetName, metricName))
-
-        Metrics.Basics.plotMetric(data, datsetName=datsetName, metricName=metricName)
-
-
-datsetName = "task1TrainData"
-metricName  = "confidence" 
-bestSet = [sim for sim in data.sims if sim.trials[0].data.datasetMetrics[datsetName][metricName][sleepStart] > sim.trials[0].data.datasetMetrics[datsetName][metricName][0]]
-
-metricName  = "classMetric2"
-bestSet = [sim for sim in bestSet if sim.trials[0].data.datasetMetrics[datsetName][metricName][sleepStart] > sim.trials[0].data.datasetMetrics[datsetName][metricName][0]]
-
-input = [(sim.trials[0].data.datasetMetrics[datsetName]["classMetric2"][sleepStart] - sim.trials[0].data.datasetMetrics[datsetName]["classMetric2"][0], sim.trials[0].data.datasetMetrics[datsetName]["confidence"][sleepStart]- sim.trials[0].data.datasetMetrics[datsetName]["confidence"][0], sim.trials[0].path,) for sim in bestSet]
-Metrics.Basics.printRankedMetric(input, sortReverse=True, sortKey=lambda x: x[0], printNum=10, folderPath=data.figureFolderPath + "/figures/", fileName="%s-BestSimsBy-%s.txt" % (datsetName, metricName))
-
+for metricName, metricFile in zip(metricNames, metricFiles):
+    Metrics.LoadData.loadMetric(data, metricName=metricName, metricFile=metricFile, forceDatasetLoadFolders=datasetNames)
+    Metrics.Basics.plotMetric(data, datsetName=datasetNames[0], metricName=metricName)
 
 data.saveFigures()
-
-
-
-# print(data.sims[0].trials[0].config)
-# print(data.sims[0].trials[0].path)
-
-# Vz.VzBasics.loadRewards(data)
-# # Vz.VzBasics.plotReward(data, sigma=50)
-# Vz.VzBasics.plotAllDataRewards(data)
-
-# data.saveFigures()
-
-
-
-
-    # Utils.RuntimeUtil.reloadLocalModules();Weights.LoadWeightData.loadWeightData(data)
-    # Utils.RuntimeUtil.reloadLocalModules();Weights.WeightBasics.plotWeightsOverTime(data)
-    # Utils.RuntimeUtil.reloadLocalModules();Weights.Pca.Pca(data)
