@@ -21,7 +21,8 @@ data = SimData(figureFolderPath="../figures/" )
 
 
 data.createSimulationStructureFromPattern( \
-    "/bazhlab/edelanois/objectDetection/projects/objectDetection/8/simulations/sim1" \
+    # "/bazhlab/edelanois/objectDetection/projects/objectDetection/8/simulations/sim1" \
+    "/bazhlab/edelanois/objectDetection/projects/objectDetection/8/simulations/MseLoss" \
     , "Sim 1 test" \
     ,[] \
     , range(0,1)) 
@@ -37,12 +38,13 @@ Utils.ConfigUtil.loadConfigsForSimulations(data)
 # Metrics.LoadData.loadConfidences(data)
 # Metrics.LoadData.loadClassMetric2(data)
 
-metricNames = ["TP", "TN", "FP", "FN", "precision", "recall", "accuracy", "loss"] 
-metricFiles = ["TFPN/TP.txt", "TFPN/TN.txt", "TFPN/FP.txt", "TFPN/FN.txt", "TFPN/precision.txt", "TFPN/recall.txt", "accuracy.txt", "loss.txt"] 
-datasetNames = ["Training"]
+metricNames = ["TP", "TN", "FP", "FN", "precision", "recall", "accuracy", "loss", "matlabAccuracy"] 
+metricFiles = ["TFPN/TP.txt", "TFPN/TN.txt", "TFPN/FP.txt", "TFPN/FN.txt", "TFPN/precision.txt", "TFPN/recall.txt", "accuracy.txt", "loss.txt", "matlabAccuracy.txt"] 
+datasetNames = ["Training", "task1TrainData", "task2TrainData"]
 
 for metricName, metricFile in zip(metricNames, metricFiles):
-    Metrics.LoadData.loadMetric(data, metricName=metricName, metricFile=metricFile, forceDatasetLoadFolders=datasetNames)
-    Metrics.Basics.plotMetric(data, datsetName=datasetNames[0], metricName=metricName)
+    Metrics.LoadData.loadMetric(data, metricName=metricName, metricFile=metricFile, forceDatasetLoadFolders=datasetNames, detectMemberDataFolders=False)
+    for datasetName in datasetNames:
+        Metrics.Basics.plotMetric(data, datsetName=datasetName, metricName=metricName)
 
 data.saveFigures()
