@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import os
 
-def plotMetric(data, datsetName="task1TrainData", metricName="confidence"):
+def plotAllTrialMetric(data, datsetName="task1TrainData", metricName="confidence"):
     print("Plotting %s" % metricName)
     fig = plt.figure()
     data.addFigure(fig, "%s-%s.png" % (datsetName, metricName))
@@ -20,6 +20,19 @@ def plotMetric(data, datsetName="task1TrainData", metricName="confidence"):
                     numDecreased += 1
 
     print("%s %s | %d increased | %d decreased | %d total number of trials" % (datsetName, metricName, numImproved, numDecreased, totalNumTrials))
+
+# plots every combination of  datasetName and metricName
+def plotTrialMetrics(data, datsetNames=["task1TrainData"], metricNames=["confidence"]):
+    for sim in data.sims:
+        for trial in sim.trials:
+            leg = []
+            fig = plt.figure()
+            trial.addFigure(fig, "%s-%s.png" % (str(datsetNames), str(metricNames)))
+            for datasetName in datsetNames:
+                for metricName in metricNames:
+                    plt.plot(trial.data.datasetMetrics[datasetName][metricName])
+                    leg.append("%s %s" % (datasetName, metricName))
+            plt.legend(leg)
 
 
 
