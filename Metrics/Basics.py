@@ -11,11 +11,12 @@ def plotAllTrialMetric(data, datsetName="task1TrainData", metricName="confidence
     for sim in data.sims:
         for trial in sim.trials:
             totalNumTrials += 1
-            plt.plot(trial.data.datasetMetrics[datsetName][metricName])
-            if trial.data.datasetMetrics[datsetName][metricName][0] < trial.data.datasetMetrics[datsetName][metricName][1]:
+            metric = trial.data.datasetMetrics[datsetName][metricName]
+            plt.plot(metric[:,0], metric[:,1])
+            if metric[0, 1] < metric[-1, 1]:
                     # print(trial.path)
                     numImproved += 1
-            if trial.data.datasetMetrics[datsetName][metricName][0] > trial.data.datasetMetrics[datsetName][metricName][1]:
+            if metric[0, 1] > metric[-1, 1]:
                     # print(trial.path)
                     numDecreased += 1
 
@@ -30,7 +31,8 @@ def plotTrialMetrics(data, datsetNames=["task1TrainData"], metricNames=["confide
             trial.addFigure(fig, "%s-%s.png" % (str(datsetNames), str(metricNames)))
             for datasetName in datsetNames:
                 for metricName in metricNames:
-                    plt.plot(trial.data.datasetMetrics[datasetName][metricName])
+                    metric = trial.data.datasetMetrics[datasetName][metricName]
+                    plt.plot(metric[:,0], metric[:,1])
                     leg.append("%s %s" % (datasetName, metricName))
             plt.legend(leg)
 

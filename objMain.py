@@ -21,9 +21,8 @@ data = SimData(figureFolderPath="../figures/" )
 
 
 data.createSimulationStructureFromPattern( \
-    # "/bazhlab/edelanois/objectDetection/projects/objectDetection/8/simulations/sim1" \
-    "/bazhlab/edelanois/objectDetection/projects/objectDetection/8/simulations/MseLoss" \
-    , "Sim 1 test" \
+    "../simulations/MseLoss5/" \
+    , "Sequential Training" \
     ,[] \
     , range(0,1)) 
 
@@ -47,8 +46,8 @@ Utils.ConfigUtil.loadConfigsForSimulations(data)
     # for datasetName in datasetNames:
         # Metrics.Basics.plotMetric(data, datsetName=datasetName, metricName=metricName)
 
-metricNames = ["pc"] 
-metricFiles = ["percentCorrect.txt"] 
+metricNames = ["TP", "TN", "FP", "FN", "precision", "recall", "F1", "accuracy", "loss", "matlabAccuracy"] 
+metricFiles = ["TFPN/TP.txt", "TFPN/TN.txt", "TFPN/FP.txt", "TFPN/FN.txt", "TFPN/precision.txt", "TFPN/recall.txt", "TFPN/F1Score.txt", "accuracy.txt", "loss.txt", "matlabAccuracy.txt"] 
 datasetNames = ["task1TrainData", "task2TrainData"]
 
 for metricName, metricFile in zip(metricNames, metricFiles):
