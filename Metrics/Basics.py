@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import os
+import numpy as np
 
 def plotAllTrialMetric(data, datsetName="task1TrainData", metricName="confidence"):
     print("Plotting %s" % metricName)
@@ -28,7 +29,7 @@ def plotTrialMetrics(data, datsetNames=["task1TrainData"], metricNames=["confide
         for trial in sim.trials:
             leg = []
             fig = plt.figure()
-            trial.addFigure(fig, "%s-%s.png" % (str(datsetNames), str(metricNames)))
+            trial.addFigure(fig, "%s-%s-line.png" % (str(datsetNames), str(metricNames)))
             for datasetName in datsetNames:
                 for metricName in metricNames:
                     metric = trial.data.datasetMetrics[datasetName][metricName]
@@ -36,7 +37,36 @@ def plotTrialMetrics(data, datsetNames=["task1TrainData"], metricNames=["confide
                     leg.append("%s %s" % (datasetName, metricName))
             plt.legend(leg)
 
+def barTrialMetrics(data, datsetNames=["task1TrainData"], metricNames=["confidence"], plotIdxs=[-1], xticks=None):
+    numBarsPerStage = len(datsetNames)
+    x = np.arange(len(plotIdxs))
+    width = 1/(numBarsPerStage + 1)
 
+
+    for sim in data.sims:
+        for trial in sim.trials:
+            fig = plt.figure()
+            trial.addFigure(fig, "%s-%s-bar.png" % (str(datsetNames), str(metricNames)))
+            shiftCounter = 0
+            leg = []
+            for datasetName in datsetNames:
+                for metricName in metricNames:
+                    leg.append("%s %s" % (datasetName, metricName))
+                    barsForStage = []
+                    stageNames = []
+                    for stageIdx in plotIdxs:
+                        barVal = trial.data.datasetMetrics[datasetName][metricName][stageIdx, 1]
+                        barsForStage.append(barVal)
+                        stageNames.append(stageIdx)
+                    shiftedX = x + (shiftCounter * width)
+                    plt.bar(shiftedX, barsForStage, width=width)
+                    shiftCounter += 1
+
+    plt.xticks(x + ((numBarsPerStage - 1) * (width / 2)), stageNames)
+    if xticks is not None:
+        plt.xticks(x + ((numBarsPerStage - 1) * (width / 2)), xticks)
+
+    plt.legend(leg)
 
 # input - array to be sorted and printed out, can contain anything
 # sotrKey - lambda function to sort array by

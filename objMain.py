@@ -53,5 +53,6 @@ datasetNames = ["task1TrainData", "task2TrainData"]
 for metricName, metricFile in zip(metricNames, metricFiles):
     Metrics.LoadData.loadMetric(data, metricName=metricName, metricFile=metricFile, forceDatasetLoadFolders=datasetNames, detectMemberDataFolders=False)
     Metrics.Basics.plotTrialMetrics(data, datsetNames=datasetNames, metricNames=[metricName])
+    Metrics.Basics.barTrialMetrics(data, datsetNames=datasetNames, metricNames=[metricName], plotIdxs=[0,-1], xticks=["Post Training", "Post Sleep"])
 
 data.saveFigures()
