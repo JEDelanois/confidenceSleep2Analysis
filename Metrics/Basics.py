@@ -62,11 +62,11 @@ def barTrialMetrics(data, datsetNames=["task1TrainData"], metricNames=["confiden
                     plt.bar(shiftedX, barsForStage, width=width)
                     shiftCounter += 1
 
-    plt.xticks(x + ((numBarsPerStage - 1) * (width / 2)), stageNames)
-    if xticks is not None:
-        plt.xticks(x + ((numBarsPerStage - 1) * (width / 2)), xticks)
+            plt.xticks(x + ((numBarsPerStage - 1) * (width / 2)), stageNames)
+            if xticks is not None:
+                plt.xticks(x + ((numBarsPerStage - 1) * (width / 2)), xticks)
 
-    plt.legend(leg)
+            plt.legend(leg)
 
 # input - array to be sorted and printed out, can contain anything
 # sotrKey - lambda function to sort array by
