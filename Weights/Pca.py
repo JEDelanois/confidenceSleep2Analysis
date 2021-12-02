@@ -51,7 +51,7 @@ def Pca(data, layers=None, pcaComponents=3):
                 plt.ylabel("PC %d\nVariance %f" % (dim2, pca.explained_variance_ratio_[dim2]))
                 plt.title("%s\nPCA ProjectionPC %d - %d" % (trial.title, dim1,dim2))
                 plt.tight_layout()
-                trial.addFigure(fig, ("pcaProjectionPC%d-%d.png" % (dim1,dim2)))
+                trial.addFigure(fig, ("pcaProjectionPC%d-%d.pdf" % (dim1,dim2)))
 
             plot2dPcaProjections(trial, pcaPoints, 0, 1, pca)
             plot2dPcaProjections(trial, pcaPoints, 0, 2, pca)
