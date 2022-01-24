@@ -24,20 +24,51 @@ def plotAllTrialMetric(data, datsetName="task1TrainData", metricName="confidence
     print("%s %s | %d increased | %d decreased | %d total number of trials" % (datsetName, metricName, numImproved, numDecreased, totalNumTrials))
 
 # plots every combination of  datasetName and metricName
-def plotTrialMetrics(data, datsetNames=["task1TrainData"], metricNames=["confidence"]):
+def plotTrialMetrics(data, datsetNames=["task1TrainData"], metricNames=["confidence"], prettyFileName=None):
     for sim in data.sims:
         for trial in sim.trials:
             leg = []
             fig = plt.figure()
-            trial.addFigure(fig, "%s-%s-line.png" % (str(datsetNames), str(metricNames)))
+
+            if prettyFileName is not None:
+                trial.addFigure(fig, prettyFileName)
+            else:
+                trial.addFigure(fig, "%s-%s-line.png" % (str(datsetNames), str(metricNames)))
+
             for datasetName in datsetNames:
                 for metricName in metricNames:
                     metric = trial.data.datasetMetrics[datasetName][metricName]
                     plt.plot(metric[:,0], metric[:,1])
                     leg.append("%s %s" % (datasetName, metricName))
-            plt.legend(leg)
+            plt.legend(leg, loc='center left', bbox_to_anchor=(1, 0.5))
+            plt.tight_layout()
 
-def barTrialMetrics(data, datsetNames=["task1TrainData"], metricNames=["confidence"], plotIdxs=[-1], xticks=None):
+def plotTrialMetricsDiff(data, datsetNames=["task1TrainData"], metricNames=["confidence"], initialPoint=0, finalPoint=1, prettyFileName=None):
+    for sim in data.sims:
+        for trial in sim.trials:
+            leg = []
+            fig,axs = plt.subplots(nrows=2, ncols=1)
+
+            if prettyFileName is not None:
+                trial.addFigure(fig, prettyFileName)
+            else:
+                trial.addFigure(fig, "%s-%s-line.png" % (str(datsetNames), str(metricNames)))
+
+            axs[0].set_title("Initial %d - Final %d" % (initialPoint, finalPoint))
+
+            allDiffs = []
+            for datasetName in datsetNames:
+                for metricName in metricNames:
+                    metric = trial.data.datasetMetrics[datasetName][metricName]
+                    diffValue = metric[finalPoint, 1] - metric[initialPoint, 1]
+                    allDiffs.append(diffValue)
+                    axs[0].scatter([0], [diffValue])
+                    leg.append("%s %s" % (datasetName, metricName))
+            axs[0].legend(leg, loc='center left', bbox_to_anchor=(1, 0.5), fontsize='xx-small')
+            axs[1].hist(allDiffs)
+            plt.tight_layout()
+
+def barTrialMetrics(data, datsetNames=["task1TrainData"], metricNames=["confidence"], plotIdxs=[-1], xticks=None, prettyFileName=None):
     numBarsPerStage = len(datsetNames)
     x = np.arange(len(plotIdxs))
     width = 1/(numBarsPerStage + 1)
@@ -46,7 +77,12 @@ def barTrialMetrics(data, datsetNames=["task1TrainData"], metricNames=["confiden
     for sim in data.sims:
         for trial in sim.trials:
             fig = plt.figure()
-            trial.addFigure(fig, "%s-%s-bar.png" % (str(datsetNames), str(metricNames)))
+
+            if prettyFileName is not None:
+                trial.addFigure(fig, prettyFileName)
+            else:
+                trial.addFigure(fig, "%s-%s-bar.png" % (str(datsetNames), str(metricNames)))
+
             shiftCounter = 0
             leg = []
             for datasetName in datsetNames:
@@ -66,7 +102,8 @@ def barTrialMetrics(data, datsetNames=["task1TrainData"], metricNames=["confiden
             if xticks is not None:
                 plt.xticks(x + ((numBarsPerStage - 1) * (width / 2)), xticks)
 
-            plt.legend(leg)
+            plt.legend(leg, loc='center left', bbox_to_anchor=(1, 0.5))
+            plt.tight_layout()
 
 # input - array to be sorted and printed out, can contain anything
 # sotrKey - lambda function to sort array by
