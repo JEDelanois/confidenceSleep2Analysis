@@ -15,4 +15,4 @@ def plotWeightsOverTime(data):
                 plt.xlabel("Epoch")
                 plt.ylabel("Strength")
                 plt.title("%s\nLayer %d to %d Weights" % (trial.title, i, i + 1))
-                trial.addFigure(fig, ("weightsOverTime%d-%d.png" % (i, i + 1)))
+                trial.addFigure(fig, ("weightsOverTime%d-%d.pdf" % (i, i + 1)))
