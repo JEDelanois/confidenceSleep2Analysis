@@ -39,7 +39,7 @@ def plotTrialMetrics(data, datsetNames=["task1TrainData"], metricNames=["confide
                 for metricName in metricNames:
                     metric = trial.data.datasetMetrics[datasetName][metricName]
                     plt.plot(metric[:,0], metric[:,1])
-                    leg.append("%s %s" % (datasetName, metricName))
+                    leg.append("%s\n%s" % (datasetName, metricName))
             plt.legend(leg, loc='center left', bbox_to_anchor=(1, 0.5))
             plt.tight_layout()
 
@@ -57,14 +57,23 @@ def plotTrialMetricsDiff(data, datsetNames=["task1TrainData"], metricNames=["con
             axs[0].set_title("Initial %d - Final %d" % (initialPoint, finalPoint))
 
             allDiffs = []
+            plotIdx = 0
+            xticks = []
             for datasetName in datsetNames:
                 for metricName in metricNames:
                     metric = trial.data.datasetMetrics[datasetName][metricName]
                     diffValue = metric[finalPoint, 1] - metric[initialPoint, 1]
                     allDiffs.append(diffValue)
-                    axs[0].scatter([0], [diffValue])
-                    leg.append("%s %s" % (datasetName, metricName))
+                    xticks.append(plotIdx)
+                    axs[0].scatter([plotIdx], [diffValue])
+                    leg.append("%s\n%s" % (datasetName, metricName))
+                    plotIdx += 1
+            # axs[0].scatter(xticks, allDiffs)
+            # axs[0].set_xticks(xticks)
+            # axs[0].set_xticklabels(leg, rotation=45)
+            mean = np.mean(allDiffs)
             axs[0].legend(leg, loc='center left', bbox_to_anchor=(1, 0.5), fontsize='xx-small')
+            axs[0].plot(xticks, np.repeat(mean, len(xticks)))
             axs[1].hist(allDiffs)
             plt.tight_layout()
 
@@ -87,7 +96,7 @@ def barTrialMetrics(data, datsetNames=["task1TrainData"], metricNames=["confiden
             leg = []
             for datasetName in datsetNames:
                 for metricName in metricNames:
-                    leg.append("%s %s" % (datasetName, metricName))
+                    leg.append("%s\n%s" % (datasetName, metricName))
                     barsForStage = []
                     stageNames = []
                     for stageIdx in plotIdxs:
