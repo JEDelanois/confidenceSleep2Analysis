@@ -40,7 +40,15 @@ data.createSimulationStructureFromPattern( \
 
 Utils.ConfigUtil.loadConfigsForSimulations(data)
 
-for trainDataset in  [True, False]:
+dataGroups = [ 
+    ["task1TrainData", "task1TrainDataBlur2", "task1TrainDataBlur10", "task1TrainDataBlur20", "task1TrainDataBlur40"]
+    , ["task1ValidationData", "task1ValidationDataBlur2", "task1ValidationDataBlur10", "task1ValidationDataBlur20", "task1ValidationDataBlur40"]
+    , ["task1ValidationDataSaltNoise1", "task1ValidationDataSaltNoise5", "task1ValidationDataSaltNoise10"]
+    , ["task1ValidationDataSaltGaussianNoise1", "task1ValidationDataSaltGaussianNoise10", "task1ValidationDataSaltGaussianNoise20"]
+]
+
+# for trainDataset in  [True, False]:
+for datasetNames in dataGroups:
 
     # for total dataset
     # classNames = [str(x) for x in range(20)] # includes class specific metrics
@@ -56,22 +64,22 @@ for trainDataset in  [True, False]:
 
 
     # load all class report, this "dataset" does not have all output file tyeps so hangle it differently
-    datasetNames = ["allClassReport"]
+    allClassReportDatasetNames = ["allClassReport"]
     for metricName, metricFile in zip(metricNames, metricFiles):
-        Metrics.LoadData.loadMetric(data, metricName=metricName, metricFile=metricFile, forceDatasetLoadFolders=datasetNames, detectMemberDataFolders=False)
-        Metrics.Basics.plotTrialMetrics(data, datsetNames=datasetNames, metricNames=[metricName])
-        Metrics.Basics.barTrialMetrics(data, datsetNames=datasetNames, metricNames=[metricName], plotIdxs=[0,-1], xticks=["Start Training", "End Training"])
+        Metrics.LoadData.loadMetric(data, metricName=metricName, metricFile=metricFile, forceDatasetLoadFolders=allClassReportDatasetNames, detectMemberDataFolders=False)
+        Metrics.Basics.plotTrialMetrics(data, datsetNames=allClassReportDatasetNames, metricNames=[metricName])
+        Metrics.Basics.barTrialMetrics(data, datsetNames=allClassReportDatasetNames, metricNames=[metricName], plotIdxs=[0,-1], xticks=["Start Training", "End Training"])
 
     # load individual class reports
     # datasetNames = ["task1TrainData", "task1TrainDataBlur2", "task1TrainDataBlur10", "task1TrainDataBlur20", "task1TrainDataBlur40"]
-    datasetNames = []
-    if trainDataset:
-        datasetNames = ["task1TrainData", "task1TrainDataBlur2", "task1TrainDataBlur10", "task1TrainDataBlur20", "task1TrainDataBlur40"]
-    else:
-        datasetNames = ["task1ValidationData", "task1ValidationDataBlur2", "task1ValidationDataBlur10", "task1ValidationDataBlur20", "task1ValidationDataBlur40"]
+    # datasetNames = []
+    # if trainDataset:
+        # datasetNames = ["task1TrainData", "task1TrainDataBlur2", "task1TrainDataBlur10", "task1TrainDataBlur20", "task1TrainDataBlur40"]
+    # else:
+        # datasetNames = ["task1ValidationData", "task1ValidationDataBlur2", "task1ValidationDataBlur10", "task1ValidationDataBlur20", "task1ValidationDataBlur40"]
 
-    metricNames.extend(["loss", "ece"] )
-    metricFiles.extend(["loss.txt", "ece.txt"] )
+    metricNames.extend(["loss", "ece", "matlabAcc"] )
+    metricFiles.extend(["loss.txt", "ece.txt", "matlabAccuracy.txt"] )
 
     for metricName, metricFile in zip(metricNames, metricFiles):
         Metrics.LoadData.loadMetric(data, metricName=metricName, metricFile=metricFile, forceDatasetLoadFolders=datasetNames, detectMemberDataFolders=False)
