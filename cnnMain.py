@@ -21,39 +21,28 @@ from simData import *
 
 data = SimData(figureFolderPath="../figures/" )
 
-# data.createSimulationStructureFromPattern( \
-    # "/bazhlab/adahuja/code/cnnSleep/simulations/bestSleepBCE/" \
-    # , "Cnn Sleep" \
-    # ,[] \
-    # , range(0,1)) 
-
-# data.createSimulationStructureFromPattern( \
-    # "/bazhlab/adahuja/code/cnnSleep/simulations/bestSleepBCE_1/" \
-    # , "Cnn Sleep" \
-    # ,[] \
-    # , range(0,1)) 
-
-# data.createSimulationStructureFromPattern( \
-    # "/bazhlab/adahuja/code/cnnSleep/simulations/bestSleepBCE_7/" \
-    # , "Cnn Sleep" \
-    # ,[] \
-    # , range(0,1)) 
-    
 data.createSimulationStructureFromPattern( \
-    "/bazhlab/adahuja/code/cnnSleep/simulations/bestSleepBCE_GT2/" \
+    "/bazhlab/edelanois/cnnSleep/1/simulations/trainMnist1/" \
+    # "/bazhlab/edelanois/cnnSleep/1/simulations/bestSleep/" \
     , "Cnn Sleep" \
     ,[] \
     , range(0,1)) 
 
-# data.createSimulationStructureFromPattern( \
-    # "/bazhlab/adahuja/code/cnnSleep/simulations/bestSleepBCE/trial0_8/" \
-    # , "Cnn Sleep" \
-    # ,[] \
-    # , range(0,1)) 
-
-
 Utils.ConfigUtil.loadConfigsForSimulations(data)
-SleepAnalysis.SleepBasics.loadSleepData(data)
-SleepAnalysis.SleepBasics.plotSleepStuff(data)
+
+dataGroups = []
+# dataGroups.append(["task1TrainData", "task1TrainDataBlur2", "task1TrainDataBlur10", "task1TrainDataBlur20", "task1TrainDataBlur40"]) 
+dataGroups.append(["task1TrainData", "task1TrainDataBlur2", "task1ValidData"]) 
+# dataGroups.append(["task1ValidData", "task1ValidDataBlur1", "task1ValidDataBlur1_5", "task1ValidDataBlur2", "task1ValidDataBlur2_5", "task1ValidDataBlur3"])
+# dataGroups.append(["task1ValidData", "task1ValidDataSP0-1", "task1ValidDataSP0-25", "task1ValidDataSP0-5"])
+
+# for trainDataset in  [True, False]:
+for datasetNames in dataGroups:
+    metricNames = ["loss", "matlabAcc"]
+    metricFiles = ["loss.txt", "matlabAccuracy.txt"]
+    print(datasetNames)
+    for metricName, metricFile in zip(metricNames, metricFiles):
+        Metrics.LoadData.loadMetric(data, metricName=metricName, metricFile=metricFile, forceDatasetLoadFolders=datasetNames, detectMemberDataFolders=False)
+        Metrics.Basics.plotTrialMetrics(data, datsetNames=datasetNames, metricNames=[metricName])
 
 data.saveFigures()
