@@ -22,7 +22,7 @@ from simData import *
 data = SimData(figureFolderPath="../figures/" )
 
 data.createSimulationStructureFromPattern( \
-    "/bazhlab/edelanois/cnnSleep/1/simulations/bestSleep2/" \
+    "../simulations/multiDistortionTest1/" \
     , "Cnn Sleep" \
     ,[] \
     , range(0,1)) 

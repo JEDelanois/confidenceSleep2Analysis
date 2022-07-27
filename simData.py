@@ -8,8 +8,10 @@ class FigureData:
         self.folderPath = FolderPath
     
     def saveFigure(self):
-        if not os.path.exists(self.folderPath):
-            os.makedirs(self.folderPath)
+        fullPath = self.folderPath + self.title
+
+        if not os.path.exists(os.path.dirname(fullPath)):
+            os.makedirs(os.path.dirname(fullPath))
 
         filePath = "%s%s" % (self.folderPath, self.title)
         print("Saving %s"  % filePath)

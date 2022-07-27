@@ -182,3 +182,112 @@ def plotSleepStuff(data):
                 plt.ylabel("Number of weights")
                 trial.addFigure(fig, "weightDiffHist-%s.png" % (layerName))
 
+            # for layerName in trial.preWeights:
+            for layerName in trial.postWeights:
+                fig = plt.figure()
+                pre = trial.preWeights[layerName]
+                post = trial.postWeights[layerName]
+                plt.hist(post.ravel() - pre.ravel())
+                plt.title("Weight Diff for Layer %s" % layerName)
+                plt.xlabel("Magnitue of Weight Differential")
+                plt.ylabel("Number of weights")
+                plt.yscale("log")
+                trial.addFigure(fig, "weightDiffHist-%s.png" % (layerName))
+
+            for layerName in trial.postWeights:
+                fig = plt.figure()
+                wts = trial.postWeights[layerName]
+                plt.hist(wts.ravel())
+                plt.title("Weight Post Sleep %s" % layerName)
+                plt.xlabel("Magnitue of Weight")
+                plt.ylabel("Number of weights")
+                trial.addFigure(fig, "weightPostSleepHist-%s.png" % (layerName))
+
+            for layerName in trial.preWeights:
+                pre = trial.preWeights[layerName]
+                if len(pre.shape) > 2: # assume it is a conv filter
+                    fig, axs = plt.subplots(pre.shape[0], pre.shape[1])
+
+                    # need to modify shapes to make generalizable when dimmension is 1
+                    if pre.shape[0] == 1:
+                        axs = np.expand_dims(axs, 0)
+                    if pre.shape[1] == 1:
+                        axs = np.expand_dims(axs, 1)
+
+                    minVal = pre.min()
+                    maxVal = pre.max()
+                    for i in range(pre.shape[0]):
+                        for j in range(pre.shape[1]):
+                            im = axs[i][j].imshow(pre[i,j,:,:], aspect='auto', interpolation='none', vmin=minVal, vmax=maxVal)
+                            # fig.colorbar(im, cax=axs[i][j])
+                            axs[i][j].axes.xaxis.set_visible(False)
+                            axs[i][j].axes.yaxis.set_visible(False)
+                    fig.suptitle("Presleep weight visualizations %s" % layerName)
+                    fig.colorbar(im, ax=axs.ravel().tolist())
+                    trial.addFigure(fig, "weightVisualizations/preSleep-%s.png" % (layerName))
+                else:
+                    fig = plt.figure()
+                    plt.imshow(pre, aspect='auto', interpolation='none')
+                    plt.title("Presleep weight visualizations %s" % layerName)
+                    plt.colorbar()
+                    trial.addFigure(fig, "weightVisualizations/preSleep-%s.png" % (layerName))
+
+            for layerName in trial.postWeights:
+                post = trial.postWeights[layerName]
+                if len(post.shape) > 2: # assume it is a conv filter
+                    fig, axs = plt.subplots(post.shape[0], post.shape[1])
+
+                    # need to modify shapes to make generalizable when dimmension is 1
+                    if post.shape[0] == 1:
+                        axs = np.expand_dims(axs, 0)
+                    if post.shape[1] == 1:
+                        axs = np.expand_dims(axs, 1)
+
+                    minVal = post.min()
+                    maxVal = post.max()
+                    for i in range(post.shape[0]):
+                        for j in range(post.shape[1]):
+                            im = axs[i][j].imshow(post[i,j,:,:], aspect='auto', interpolation='none', vmin=minVal, vmax=maxVal)
+                            # fig.colorbar(im, cax=axs[i][j])
+                            axs[i][j].axes.xaxis.set_visible(False)
+                            axs[i][j].axes.yaxis.set_visible(False)
+                    fig.suptitle("Postsleep weight visualizations %s" % layerName)
+                    fig.colorbar(im, ax=axs.ravel().tolist())
+                    trial.addFigure(fig, "weightVisualizations/postSleep-%s.png" % (layerName))
+                else:
+                    fig = plt.figure()
+                    plt.imshow(post, aspect='auto', interpolation='none')
+                    plt.title("Postsleep weight visualizations %s" % layerName)
+                    plt.colorbar()
+                    trial.addFigure(fig, "weightVisualizations/postSleep-%s.png" % (layerName))
+
+            for layerName in trial.postWeights:
+                pre = trial.preWeights[layerName]
+                post = trial.postWeights[layerName]
+                diff = post-pre
+                if len(diff.shape) > 2: # assume it is a conv filter
+                    fig, axs = plt.subplots(diff.shape[0], diff.shape[1])
+
+                    # need to modify shapes to make generalizable when dimmension is 1
+                    if diff.shape[0] == 1:
+                        axs = np.expand_dims(axs, 0)
+                    if diff.shape[1] == 1:
+                        axs = np.expand_dims(axs, 1)
+
+                    minVal = diff.min()
+                    maxVal = diff.max()
+                    for i in range(diff.shape[0]):
+                        for j in range(diff.shape[1]):
+                            im = axs[i][j].imshow(diff[i,j,:,:], aspect='auto', interpolation='none', vmin=minVal, vmax=maxVal)
+                            # fig.colorbar(im, cax=axs[i][j])
+                            axs[i][j].axes.xaxis.set_visible(False)
+                            axs[i][j].axes.yaxis.set_visible(False)
+                    fig.suptitle("Diff sleep weight visualizations %s" % layerName)
+                    fig.colorbar(im, ax=axs.ravel().tolist())
+                    trial.addFigure(fig, "weightVisualizations/diffSleep-%s.png" % (layerName))
+                else:
+                    fig = plt.figure()
+                    plt.imshow(diff, aspect='auto', interpolation='none')
+                    plt.title("diff sleep weight visualizations %s" % layerName)
+                    plt.colorbar()
+                    trial.addFigure(fig, "weightVisualizations/diffSleep-%s.png" % (layerName))
