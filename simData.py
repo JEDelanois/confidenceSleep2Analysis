@@ -17,7 +17,6 @@ class FigureData:
         print("Saving %s"  % filePath)
         self.fig.savefig(filePath)
 
-
 class FigureList():
     def __init__(self):
         self.figs = list()
