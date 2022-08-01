@@ -33,23 +33,44 @@ def getAllDataFromDataset(
         pass
     return batchData, batchLabels
 
-def getFlattenedActivationsForDatasets(model, datasets, datasetSymbols):
+def getActivationsForDatasets(model, datasets, datasetSymbols=None, flatten=True):
     allActivations = [] # allActivations[layerIdx][exampleIdx] = features
     allLabels = [] # allLabels[exampleIdx] = label
     markers = [] # marker[exampleIdx] = marker
+    flattenIdx = 1 if flatten else -1
     for datasetIdx, dataset in enumerate(datasets):
         model(dataset[0])
         allLabels.extend(torch.argmax(dataset[1], dim=1).tolist())
-        markers.extend([datasetSymbols[datasetIdx]] * dataset[1].shape[0])
+        if datasetSymbols is not None:
+            markers.extend([datasetSymbols[datasetIdx]] * dataset[1].shape[0])
         # print(len(allLabels))
         # print(len(markers))
 
         for i,activation in enumerate(model.activations):
             if i >= len(allActivations):
                 allActivations.append(torch.tensor([]))
-            allActivations[i] = torch.cat([allActivations[i], model.activations[i].flatten(start_dim=1).detach()], dim=0) # flattens all features to single dimmension
+            allActivations[i] = torch.cat([allActivations[i], model.activations[i].flatten(start_dim=flattenIdx).detach()], dim=0) # flattens all features to single dimmension
 
     return allActivations, torch.tensor(allLabels), markers 
+
+# def getFlattenedActivationsForDatasets(model, datasets, datasetSymbols=None):
+    # allActivations = [] # allActivations[layerIdx][exampleIdx] = features
+    # allLabels = [] # allLabels[exampleIdx] = label
+    # markers = [] # marker[exampleIdx] = marker
+    # for datasetIdx, dataset in enumerate(datasets):
+        # model(dataset[0])
+        # allLabels.extend(torch.argmax(dataset[1], dim=1).tolist())
+        # if datasetSymbols is not None:
+            # markers.extend([datasetSymbols[datasetIdx]] * dataset[1].shape[0])
+        # # print(len(allLabels))
+        # # print(len(markers))
+
+        # for i,activation in enumerate(model.activations):
+            # if i >= len(allActivations):
+                # allActivations.append(torch.tensor([]))
+            # allActivations[i] = torch.cat([allActivations[i], model.activations[i].flatten(start_dim=1).detach()], dim=0) # flattens all features to single dimmension
+
+    # return allActivations, torch.tensor(allLabels), markers 
 
 def getPCASpace(
     data
@@ -73,7 +94,7 @@ def getPCASpace(
             datasets = [getAllDataFromDataset(d) for d in datasets]
 
 
-            allActivations, allLabels, markers  = getFlattenedActivationsForDatasets(model, datasets, datasetSymbols)
+            allActivations, allLabels, markers  = getActivationsForDatasets(model, datasets, datasetSymbols)
 
             def plotPcScatter(features, pca, labels, markers, dim0, dim1, folderPrefix="layer0"):
                 colors = [key for key in mcolors.TABLEAU_COLORS]
@@ -126,7 +147,7 @@ def getKMeansClustering(
             datasets = [getAllDataFromDataset(d) for d in datasets]
 
 
-            allActivations, allLabels, markers  = getFlattenedActivationsForDatasets(model, datasets, datasetSymbols)
+            allActivations, allLabels, markers  = getActivationsForDatasets(model, datasets, datasetSymbols)
 
             def plotKmeansStuff(features, kmeans, labels, markers, folderPrefix="layer0"):
                 colors = [key for key in mcolors.TABLEAU_COLORS]
@@ -206,8 +227,8 @@ def getSingleDatasetKMeansClustering(
             trainDataset = simObj.members[trainDatasetName]
             trainDataset = getAllDataFromDataset(trainDataset)
 
-            trainActivations , trainLabels , trainMarkers  = getFlattenedActivationsForDatasets(model, [trainDataset], datasetSymbols) 
-            allActivations, allLabels, markers  = getFlattenedActivationsForDatasets(model, datasets, datasetSymbols)
+            trainActivations , trainLabels , trainMarkers  = getActivationsForDatasets(model, [trainDataset], datasetSymbols) 
+            allActivations, allLabels, markers  = getActivationsForDatasets(model, datasets, datasetSymbols)
 
             def plotKmeansStuff(features, kmeans, labels, markers, folderPrefix="layer0"):
                 colors = [key for key in mcolors.TABLEAU_COLORS]
@@ -384,8 +405,8 @@ def getKMeansDiff(
             trainDatasets = [simObj.members[d] for d in trainDatasetNames]
             trainDatasets = [getAllDataFromDataset(d) for d in trainDatasets]
 
-            trainActivations , trainLabels , trainMarkers  = getFlattenedActivationsForDatasets(model, trainDatasets, datasetSymbols) 
-            allActivations, allLabels, markers  = getFlattenedActivationsForDatasets(model, datasets, datasetSymbols)
+            trainActivations , trainLabels , trainMarkers  = getActivationsForDatasets(model, trainDatasets, datasetSymbols) 
+            allActivations, allLabels, markers  = getActivationsForDatasets(model, datasets, datasetSymbols)
 
 
             for i in range(len(allActivations)):
@@ -396,3 +417,86 @@ def getKMeansDiff(
                 plotKmeansStuff(trial, allActivations[i], kmeans, allLabels, markers, folderPrefix="/kmeansDiff/%s/training-%s/testing-%s/layer%d" % (outputFolderPrefix,str(trainDatasetNames), str(datasetNames), i))
                 plotKmeansClassifications(trial, allActivations[i], kmeans, allLabels, markers, folderPrefix="/kmeansDiff/%s/training-%s/testing-%s/layer%d" % (outputFolderPrefix,str(trainDatasetNames), str(datasetNames), i))
                 # code.interact(local=dict(globals(), **locals()))
+
+def getConvLayerGradientMetric(
+    data
+    , modelName="model"
+    , modelNameloadModelPaths=["/stateDict/modelStateDict0.pth"]
+    , linePrettyNames = ["Post training"]
+    , datasetNames=["task1ValidData", "task1ValidData-Blur-1", "task1ValidData-Blur-2", "task1ValidData-Blur-3"]
+    , datsetValues=[0, 1, 2, 3]
+    , prettyXTicks=True
+    ):
+
+
+    for sim in data.sims:
+        for trial in sim.trials: 
+            plts = [plt.subplots(1, 2) for i in range(5)]
+            cmap = plt.get_cmap("tab10")
+            for pathIdx,modelNameloadModelPath in enumerate(modelNameloadModelPaths):
+                simObj = Simulation(trial.config, **trial.config)
+                simObj.createSimMembers(trial.config["members"], trial.config["modifiers"], trial.config["stages"], cachedSimMembers={})
+                model = simObj.members[modelName]
+                modelNameloadModelPathFull = trial.path + modelNameloadModelPath
+
+                model.load_state_dict(torch.load(modelNameloadModelPathFull, map_location=devices.comp))
+                datasets = [simObj.members[d] for d in datasetNames]
+                datasets = [getAllDataFromDataset(d) for d in datasets]
+
+                xs = []
+                Means = None
+                Stds = None
+                prettyXTicks = []
+                for dIdx, dataset in enumerate(datasets):
+                    prettyXTicks.append("%s %s" % (datasetNames[dIdx], str(datsetValues[dIdx])))
+                    allActivations, allLabels, markers  = getActivationsForDatasets(model, [dataset], datasetSymbols=None, flatten=False)
+                    if Means is None and Stds is None:
+                        # Means = [[0.0] * len(datasetNames)] * len(allActivations) # every layer has its own mean and std
+                        # Stds = [[0.0] * len(datasetNames)] * len(allActivations) # every layer has its own mean and std
+                        Means = [[0.0] * len(datasetNames) for ii in range(len(allActivations))] # every layer has its own mean and std
+                        Stds = [[0.0] * len(datasetNames) for ii in range(len(allActivations))] # every layer has its own mean and std
+                    xs.append(datsetValues[dIdx])
+                    for lIdx,layerActivations in enumerate(allActivations):
+                        if len(layerActivations.shape) <= 2: # if feed forward then skip
+                            continue
+                        channels = layerActivations.size()[1]
+                        sobelV = torch.tensor([[1, 2, 1], [0, 0, 0], [-1, -2, -1]], dtype=torch.float32) / 4.0
+                        sobelKernelV = sobelV.unsqueeze(0).expand(1, 1, 3, 3)
+                        sobelH = sobelV.clone().T
+                        sobelKernelH = sobelH.unsqueeze(0).expand(1, 1, 3, 3)
+                        channelValues = torch.tensor([])
+                        for c in range(channels):
+                            try:
+                                channelData = layerActivations[:, c, :, :].unsqueeze(1)
+                            except:
+                                code.interact(local=dict(globals(), **locals()))
+                            gradV = torch.nn.functional.conv2d(channelData, sobelKernelV, bias=None, stride=1, padding=0, dilation=1, groups=1)
+                            gradH = torch.nn.functional.conv2d(channelData, sobelKernelH, bias=None, stride=1, padding=0, dilation=1, groups=1)
+
+                            ssum = (gradV.pow(2) + gradH.pow(2)).pow(0.5)
+                            channelValues = torch.cat([channelValues, ssum], dim=0) # flattens all features to single dimmension
+
+                        Means[lIdx][dIdx] = channelValues.mean().item()
+                        Stds[lIdx][dIdx] = channelValues.std().item()
+
+                for i in range(len(Means)): # i is layer index
+                    Means[i] = np.array(Means[i])
+                    Stds[i] = np.array(Stds[i])
+
+                    plts[i][1][0].plot(Means[i], color=cmap(pathIdx))
+                    plts[i][1][1].plot(Stds[i], color=cmap(pathIdx))
+
+                    # fig= plt.figure()
+                    # plt.plot(xs, Means[i], color="tab:orange")
+                    # plt.fill_between(xs, Means[i]+Stds[i], Means[i]-Stds[i], color="tab:orange", alpha=0.4)
+                    # if prettyXTicks:
+                        # plt.xticks(xs, prettyXTicks, rotation = 90)
+                    # plt.tight_layout()
+                    # trial.addFigure(fig, "/features/gradientMetric/%s/layer%d/gradientMEtricOverDataset.png" % (str(datasetNames), i))
+            for i in  range(len(plts)):
+                if prettyXTicks:
+                    plts[i][1][0].set_xticks(xs, prettyXTicks, rotation = 90)
+                    plts[i][1][1].set_xticks(xs, prettyXTicks, rotation = 90)
+                plts[i][1][1].legend(linePrettyNames, loc='center left', bbox_to_anchor=(1, 0.5))
+                plts[i][0].tight_layout()
+                trial.addFigure(plts[i][0], "/features/gradientMetric/%s/layer%d/gradientMEtricOverDataset.png" % (str(datasetNames), i))

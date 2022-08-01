@@ -133,3 +133,41 @@ def printRankedMetric(input, sortReverse=False, sortKey=lambda x: x[0], printNum
             for i in range(printNum):
                 outFile.write('%s\n' % (str(input[i])))
     
+# x-axis - datset name gets mapped to dataset value and plotted 
+# y-axis - metric value 
+# every line corresponds to a different time point
+
+def plotTrialMetricOverDatasetValue(data, datsetNames=["task1TrainData"], datsetValues=[0], timePoints=[0], metricName="confidence", timePointsPrettyNames=None, prettyXTicks=True, prettyFileName=None, prettyXLabel=None):
+    for sim in data.sims:
+        for trial in sim.trials:
+            leg = []
+            fig = plt.figure()
+
+            if prettyFileName is not None:
+                trial.addFigure(fig, prettyFileName)
+            else:
+                trial.addFigure(fig, "%s-%s-metricOverDatasetValue.pdf" % (str(datsetNames), str(metricName)))
+
+            for t,timePoint in enumerate(timePoints):
+                xs = []
+                ys = []
+                prettyXTicks = []
+                for i, datasetName in enumerate(datsetNames):
+                    prettyXTicks.append("%s %s" % (datasetName, str(datsetValues[i])))
+                    xs.append(datsetValues[i])
+                    metricValue = trial.data.datasetMetrics[datasetName][metricName][timePoint,1]
+                    ys.append(metricValue)
+
+                plt.plot(xs,ys)
+                if timePointsPrettyNames ==  None:
+                    leg.append("TimePoint %s" % (str(timePoint)))
+                else:
+                    leg.append("TimePoint %s" % (timePointsPrettyNames[t]))
+
+            plt.legend(leg, loc='center left', bbox_to_anchor=(1, 0.5))
+            if prettyXTicks:
+                plt.xticks(xs, prettyXTicks, rotation = 90)
+            plt.ylabel(metricName)
+            if prettyXLabel is not None:
+                plt.xlabel(prettyXLabel)
+            plt.tight_layout()
