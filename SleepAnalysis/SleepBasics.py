@@ -14,6 +14,7 @@ import Weights.WeightUtils
 from sklearn.decomposition import PCA
 import matplotlib.colors as colors
 from matplotlib.pyplot import cm
+import code
 
 def atof(text):
     try:
@@ -216,14 +217,23 @@ def plotSleepStuff(data):
 
                     minVal = pre.min()
                     maxVal = pre.max()
+                    if minVal == 0.0 and maxVal == 0.0:
+                        minVal = -0.0001
+                        maxVal = 0.0001
                     for i in range(pre.shape[0]):
                         for j in range(pre.shape[1]):
                             im = axs[i][j].imshow(pre[i,j,:,:], aspect='auto', interpolation='none', vmin=minVal, vmax=maxVal)
                             # fig.colorbar(im, cax=axs[i][j])
                             axs[i][j].axes.xaxis.set_visible(False)
                             axs[i][j].axes.yaxis.set_visible(False)
+                            axs[i][j].axis('equal')
+                            axs[i][j].spines['top'].set_visible(False)
+                            axs[i][j].spines['right'].set_visible(False)
+                            axs[i][j].spines['bottom'].set_visible(False)
+                            axs[i][j].spines['left'].set_visible(False)
                     fig.suptitle("Presleep weight visualizations %s" % layerName)
                     fig.colorbar(im, ax=axs.ravel().tolist())
+                    # fig.tight_layout()
                     trial.addFigure(fig, "weightVisualizations/preSleep-%s.png" % (layerName))
                 else:
                     fig = plt.figure()
@@ -245,12 +255,20 @@ def plotSleepStuff(data):
 
                     minVal = post.min()
                     maxVal = post.max()
+                    if minVal == 0.0 and maxVal == 0.0:
+                        minVal = -0.0001
+                        maxVal = 0.0001
                     for i in range(post.shape[0]):
                         for j in range(post.shape[1]):
                             im = axs[i][j].imshow(post[i,j,:,:], aspect='auto', interpolation='none', vmin=minVal, vmax=maxVal)
                             # fig.colorbar(im, cax=axs[i][j])
                             axs[i][j].axes.xaxis.set_visible(False)
                             axs[i][j].axes.yaxis.set_visible(False)
+                            axs[i][j].axis('equal')
+                            axs[i][j].spines['top'].set_visible(False)
+                            axs[i][j].spines['right'].set_visible(False)
+                            axs[i][j].spines['bottom'].set_visible(False)
+                            axs[i][j].spines['left'].set_visible(False)
                     fig.suptitle("Postsleep weight visualizations %s" % layerName)
                     fig.colorbar(im, ax=axs.ravel().tolist())
                     trial.addFigure(fig, "weightVisualizations/postSleep-%s.png" % (layerName))
@@ -276,12 +294,23 @@ def plotSleepStuff(data):
 
                     minVal = diff.min()
                     maxVal = diff.max()
+
+                    if minVal == 0 and maxVal == 0:
+                        minVal = -0.0001
+                        maxVal = 0.0001
+
+                    # code.interact(local=dict(globals(), **locals()))
                     for i in range(diff.shape[0]):
                         for j in range(diff.shape[1]):
                             im = axs[i][j].imshow(diff[i,j,:,:], aspect='auto', interpolation='none', vmin=minVal, vmax=maxVal)
                             # fig.colorbar(im, cax=axs[i][j])
                             axs[i][j].axes.xaxis.set_visible(False)
                             axs[i][j].axes.yaxis.set_visible(False)
+                            axs[i][j].axis('equal')
+                            axs[i][j].spines['top'].set_visible(False)
+                            axs[i][j].spines['right'].set_visible(False)
+                            axs[i][j].spines['bottom'].set_visible(False)
+                            axs[i][j].spines['left'].set_visible(False)
                     fig.suptitle("Diff sleep weight visualizations %s" % layerName)
                     fig.colorbar(im, ax=axs.ravel().tolist())
                     trial.addFigure(fig, "weightVisualizations/diffSleep-%s.png" % (layerName))

@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import os
 import numpy as np
+import code
 
 def plotAllTrialMetric(data, datsetName="task1TrainData", metricName="confidence"):
     print("Plotting %s" % metricName)
@@ -136,7 +137,6 @@ def printRankedMetric(input, sortReverse=False, sortKey=lambda x: x[0], printNum
 # x-axis - datset name gets mapped to dataset value and plotted 
 # y-axis - metric value 
 # every line corresponds to a different time point
-
 def plotTrialMetricOverDatasetValue(data, datsetNames=["task1TrainData"], datsetValues=[0], timePoints=[0], metricName="confidence", timePointsPrettyNames=None, prettyXTicks=True, prettyFileName=None, prettyXLabel=None):
     for sim in data.sims:
         for trial in sim.trials:
@@ -171,3 +171,48 @@ def plotTrialMetricOverDatasetValue(data, datsetNames=["task1TrainData"], datset
             if prettyXLabel is not None:
                 plt.xlabel(prettyXLabel)
             plt.tight_layout()
+
+# x-axis - datset name gets mapped to dataset value and plotted 
+# y-axis - metric value 
+# every line corresponds the data set at a specific time point
+def plotSpecificTrialMetricOverDatasetValue(datas, datsetNames=["task1TrainData"], datsetValues=[0], timePoints=[0], metricName="confidence", timePointsPrettyNames=None, prettyXTicks=True, prettyFileName=None, prettyXLabel=None):
+    # code.interact(local=dict(globals(), **locals()))
+    assert len(datas) == len(timePoints)
+
+
+    leg = []
+    fig = plt.figure()
+    if prettyFileName is not None:
+        for data in datas:
+            data.addFigure(fig, prettyFileName)
+    else:
+        for data in datas:
+            data.addFigure(fig, "%s-%s-specificMetricOverDatasetValue.pdf" % (str(datsetNames), str(metricName)))
+    for t,(data, timePoint) in enumerate(zip(datas,timePoints)):
+        for sim in data.sims:
+            for trial in sim.trials:
+
+
+                # for t,timePoint in enumerate(timePoints):
+                xs = []
+                ys = []
+                prettyXTicks = []
+                for i, datasetName in enumerate(datsetNames):
+                    prettyXTicks.append("%s %s" % (datasetName, str(datsetValues[i])))
+                    xs.append(datsetValues[i])
+                    metricValue = trial.data.datasetMetrics[datasetName][metricName][timePoint,1]
+                    ys.append(metricValue)
+
+                plt.plot(xs,ys)
+                if timePointsPrettyNames ==  None:
+                    leg.append("TimePoint %s" % (str(timePoint)))
+                else:
+                    leg.append("TimePoint %s" % (timePointsPrettyNames[t]))
+
+        plt.legend(leg, loc='center left', bbox_to_anchor=(1, 0.5))
+        if prettyXTicks:
+            plt.xticks(xs, prettyXTicks, rotation = 90)
+        plt.ylabel(metricName)
+        if prettyXLabel is not None:
+            plt.xlabel(prettyXLabel)
+        plt.tight_layout()
