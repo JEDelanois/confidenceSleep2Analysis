@@ -80,16 +80,10 @@ for i,datasetNames in enumerate(dataGroups):
     for metricName, metricFile in zip(metricNames, metricFiles):
         Metrics.LoadData.loadMetric(data, metricName=metricName, metricFile=metricFile, forceDatasetLoadFolders=datasetNames, detectMemberDataFolders=False)
         Metrics.Basics.plotTrialMetrics(data, datsetNames=datasetNames, metricNames=[metricName])
-        Metrics.Basics.plotTrialMetricOverDatasetValue(data, datsetNames=datasetNames, datsetValues=valueGroup, timePoints=[0,-1], metricName=metricName, timePointsPrettyNames=["Post Training", "Post Finetuning"], prettyFileName=None)
+        Metrics.Basics.plotTrialMetricOverDatasetValue(data, datsetNames=datasetNames, datsetValues=valueGroup, timePoints=[0,-1], metricName=metricName, timePointsPrettyNames=["Post Training", "Post Sleep"], prettyFileName=None)
 
-allDatasets = []
-[allDatasets.extend(d) for d in dataGroups]
-
-datas = []
-Metrics.Basics.plotMetricTable(datas, datsetNames=allDatasets, timePoints=[0], metricName="confidence", timePointsPrettyNames=None, prettyXTicks=True, prettyFileName=None, prettyXLabel=None):
-
-# SleepAnalysis.SleepBasics.loadSleepData(data)
-# SleepAnalysis.SleepBasics.plotSleepStuff(data)
+SleepAnalysis.SleepBasics.loadSleepData(data)
+SleepAnalysis.SleepBasics.plotSleepStuff(data)
 
 # for i,dataGroup in enumerate(dataGroups):
     # Feature.FeatureMain.getConvLayerGradientMetric(
