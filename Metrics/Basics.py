@@ -1,7 +1,11 @@
 import matplotlib.pyplot as plt
 import os
 import numpy as np
+import copy
 import code
+from tabulate import tabulate
+
+
 
 def plotAllTrialMetric(data, datsetName="task1TrainData", metricName="confidence"):
     print("Plotting %s" % metricName)
@@ -216,3 +220,128 @@ def plotSpecificTrialMetricOverDatasetValue(datas, datsetNames=["task1TrainData"
         if prettyXLabel is not None:
             plt.xlabel(prettyXLabel)
         plt.tight_layout()
+
+# x-axis - dataset name
+# y-axis - certain time point for certain data object
+# every line corresponds the data set at a specific time point
+def plotMetricTable(datas, datsetNames=["task1TrainData"], timePoints=[0], metricName="confidence", timePointsPrettyNames=None, prettyXTicks=True, prettyFileName=None, prettyXLabel=None):
+    # code.interact(local=dict(globals(), **locals()))
+    assert len(datas) == len(timePoints)
+    # code.interact(local=dict(globals(), **locals()))
+
+
+    #________ imshow
+    fig = plt.figure()
+    if prettyFileName is not None:
+        for data in datas:
+            data.addFigure(fig, "%s-%s-imshow.png" % (prettyFileName, str(metricName)))
+    else:
+        for data in datas:
+            data.addFigure(fig, "%s-%s-imshow.png" % (str(datsetNames), str(metricName)))
+
+    yticks = []
+    table = []
+    # right now this only works for a single trial
+    for t,(data, timePoint) in enumerate(zip(datas,timePoints)):
+        for sim in data.sims:
+            for trial in sim.trials:
+                # for t,timePoint in enumerate(timePoints):
+                table.append([])
+                for i, datasetName in enumerate(datsetNames):
+                    metricValue = trial.data.datasetMetrics[datasetName][metricName][timePoint,1]
+                    table[-1].append(metricValue)
+                
+                if timePointsPrettyNames ==  None:
+                    yticks.append("%s TimePoint %s" % (str(timePoint)))
+                else:
+                    yticks.append("%s" % (timePointsPrettyNames[t]))
+                # code.interact(local=dict(globals(), **locals()))
+
+    
+
+    xticks = copy.deepcopy(datsetNames) + ["Average"]
+    table = np.array(table)
+    table = np.hstack((table, np.expand_dims(table.mean(1), axis=1)))
+    # vmin = 0.0
+    # vmax = 1.0
+    vmin = None
+    vmax = None
+    plt.imshow(table, interpolation='none', cmap="Reds", aspect="auto", vmin=vmin, vmax=vmax)
+    ax = plt.gca()
+    for (j,i),label in np.ndenumerate(table):
+        label = "%.4f" % label
+        ax.text(i,j,label,ha='center',va='center', size="small")
+        ax.text(i,j,label,ha='center',va='center', size="small")
+
+    plt.xticks([i for i in range(len(xticks))], xticks, rotation = 90)
+    plt.yticks([i for i in range(len(yticks))], yticks)
+    plt.title(metricName)
+    plt.xlabel("Dataset")
+    plt.ylabel("Model")
+    plt.tight_layout()
+    plt.colorbar()
+
+
+    #________ blot bar means
+    fig = plt.figure()
+    if prettyFileName is not None:
+        for data in datas:
+            data.addFigure(fig, "%s-%s-barMeans.png" % (prettyFileName, str(metricName)))
+    else:
+        for data in datas:
+            data.addFigure(fig, "%s-%s-barMeans.png" % (str(datsetNames), str(metricName)))
+
+    means = table[:,-1]
+    mmin = means.min() - (0.05 * means.min())
+    mmax = means.max() + (0.05 * means.max())
+    plt.bar(np.arange(means.shape[0]), means)
+    plt.xticks(np.arange(means.shape[0]), yticks)
+    plt.ylim((mmin, mmax))
+    plt.title("Mean %s" % (metricName))
+    plt.ylabel(metricName)
+
+
+
+
+
+    #________ table
+
+    fig, ax = plt.subplots(1, 1)
+    if prettyFileName is not None:
+        for data in datas:
+            data.addFigure(fig, "%s-%s-table.png" % (prettyFileName, str(metricName)))
+    else:
+        for data in datas:
+            data.addFigure(fig, "%s-%s-table.png" % (str(datsetNames), str(metricName)))
+    
+    ax.axis('tight')
+    ax.axis('off')
+    the_table = ax.table(table, rowLabels=yticks, colLabels=xticks, cellLoc="center")
+    the_table.auto_set_font_size(False)
+    the_table.set_fontsize(10)
+    ax.set_title(metricName)
+    plt.tight_layout()
+
+    fileOutputPaths = []
+    if prettyFileName is not None:
+        for data in datas:
+            fileOutputPaths.append("%s/figures/%s-%s-table.txt" % (data.figureFolderPath, prettyFileName, str(metricName)))
+    else:
+        for data in datas:
+            fileOutputPaths.append("%s/figures/%s-%s-table.txt" % (data.figureFolderPath, str(datsetNames), str(metricName)))
+
+    #________ tabulate table
+
+    listTable = table.tolist()
+    for i,row in enumerate(listTable):
+        row.insert(0, yticks[i])
+
+    s = tabulate(listTable, headers=xticks)
+    for filePath in fileOutputPaths:
+        os.makedirs(os.path.dirname(filePath), exist_ok=True)
+        with open(filePath, "w") as f:
+            f.write(s)
+
+    
+
+

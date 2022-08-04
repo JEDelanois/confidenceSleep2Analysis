@@ -103,6 +103,7 @@ class SimData:
         self.sims = list()
         self.figureFolderPath = figureFolderPath
         self.__figures = FigureList()
+        self.titlePattern = None
 
     def addFigure(self, fig, title):
         self.__figures.addFigure("%sfigures/" % (self.figureFolderPath), fig, title)
@@ -172,6 +173,7 @@ class SimData:
     #listOfVariables - list of lists, variables to replace in pattern 
     #trials - number of trials
     def createSimulationStructureFromPattern(self, filePattern, titlePattern, listOfVariables , trials, removeWhiteSpaceFromPath=False):
+        self.titlePattern = titlePattern
         self._createSimulationStructureFromPatternHelper(0, filePattern, titlePattern, list(listOfVariables) , trials, removeWhiteSpaceFromPath=removeWhiteSpaceFromPath)
 
     def clearSimulationData(self):
