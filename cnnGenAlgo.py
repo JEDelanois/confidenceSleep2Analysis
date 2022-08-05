@@ -82,7 +82,7 @@ for i,datasetNames in enumerate(dataGroups):
     for metricName, metricFile in zip(metricNames, metricFiles):
         Metrics.LoadData.loadMetric(data, metricName=metricName, metricFile=metricFile, forceDatasetLoadFolders=datasetNames, detectMemberDataFolders=False)
         Metrics.Basics.plotTrialMetrics(data, datsetNames=datasetNames, metricNames=[metricName])
-        Metrics.Basics.plotTrialMetricOverDatasetValue(data, datsetNames=datasetNames, datsetValues=valueGroup, timePoints=[0], metricName=metricName, timePointsPrettyNames=["Post Training"], prettyFileName=None)
+        Metrics.Basics.plotTrialMetricOverDatasetValue(data, datsetNames=datasetNames, datsetValues=valueGroup, timePoints=[0], metricName=metricName, timePointsPrettyNames=["Post Sleep"], prettyFileName=None)
 
 # allDatasets = []
 # [allDatasets.extend(d) for d in dataGroups]
