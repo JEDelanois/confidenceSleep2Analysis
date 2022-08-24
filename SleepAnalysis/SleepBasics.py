@@ -15,6 +15,7 @@ from sklearn.decomposition import PCA
 import matplotlib.colors as colors
 from matplotlib.pyplot import cm
 import code
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 def atof(text):
     try:
@@ -240,6 +241,62 @@ def plotSleepStuff(data):
                     plt.imshow(pre, aspect='auto', interpolation='none')
                     plt.title("Presleep weight visualizations %s" % layerName)
                     plt.colorbar()
+                    trial.addFigure(fig, "weightVisualizations/preSleep-%s.png" % (layerName))
+
+            for layerName in trial.preWeights:
+                pre = trial.preWeights[layerName]
+                post = trial.postWeights[layerName]
+                if len(pre.shape) > 2: # assume it is a conv filter
+
+                    # need to modify shapes to make generalizable when dimmension is 1
+                    if pre.shape[0] == 1:
+                        axs = np.expand_dims(axs, 0)
+                    if pre.shape[1] == 1:
+                        axs = np.expand_dims(axs, 1)
+
+                    minVal = min(pre.min(), post.min())
+                    maxVal = max(pre.max(), post.max())
+                    if minVal == 0.0 and maxVal == 0.0:
+                        minVal = -0.0001
+                        maxVal = 0.0001
+                    for i in range(pre.shape[0]):
+                        for j in range(pre.shape[1]):
+                            fig, axs = plt.subplots(1, 3)
+                            try:
+                                im = axs[0].imshow(pre[i,j,:,:], aspect='auto', interpolation='none', vmin=minVal, vmax=maxVal)
+                                divider = make_axes_locatable(axs[0])
+                                cax = divider.append_axes('right', size='5%', pad=0.05)
+                                fig.colorbar(im, cax=cax, orientation='vertical')
+                                axs[0].set_title("PreSleep Weights")
+
+                                im = axs[1].imshow(post[i,j,:,:], aspect='auto', interpolation='none', vmin=minVal, vmax=maxVal)
+                                divider = make_axes_locatable(axs[1])
+                                cax = divider.append_axes('right', size='5%', pad=0.05)
+                                fig.colorbar(im, cax=cax, orientation='vertical')
+                                axs[1].set_title("PostSleep Weights")
+                                
+                                diff = post[i,j,:,:] - pre[i,j,:,:]
+                                im = axs[2].imshow(diff, aspect='auto', interpolation='none', vmin=diff.min(), vmax=diff.max())
+                                divider = make_axes_locatable(axs[2])
+                                cax = divider.append_axes('right', size='5%', pad=0.05)
+                                fig.colorbar(im, cax=cax, orientation='vertical')
+                                axs[2].set_title("Difference")
+                            except Exception as e:
+                                print(e)
+                                code.interact(local=dict(globals(), **locals()))
+
+                            # fig.colorbar(im, cax=axs[i][j])
+                            for jj in range(3):
+                                axs[jj].axes.xaxis.set_visible(False)
+                                axs[jj].axes.yaxis.set_visible(False)
+                                axs[jj].axis('equal')
+                                axs[jj].spines['top'].set_visible(False)
+                                axs[jj].spines['right'].set_visible(False)
+                                axs[jj].spines['bottom'].set_visible(False)
+                                axs[jj].spines['left'].set_visible(False)
+                            trial.addFigure(fig, "weightVisualizations/layerWeights-%s_all/filter-%d-%d.png" % (layerName,i,j))
+                    fig.suptitle("Presleep weight visualizations %s" % layerName)
+                    # fig.tight_layout()
                     trial.addFigure(fig, "weightVisualizations/preSleep-%s.png" % (layerName))
 
             for layerName in trial.postWeights:
