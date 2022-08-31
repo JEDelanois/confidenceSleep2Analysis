@@ -22,6 +22,7 @@ class FigureList():
         self.figs = list()
 
     def clearFigs(self):
+        del self.figs
         self.figs = list()
 
     def addFigure(self, figureFolderPath, fig, title):
@@ -66,6 +67,9 @@ class Trial:
         }
         self.__figures = FigureList()
 
+    def clearFigs(self):
+        self.__figures.clearFigs()
+
     def addFigure(self, fig, title):
         self.__figures.addFigure("%s/figures/" % (self.path), fig, title)
     
@@ -84,6 +88,17 @@ class Simulation:
         title = None 
         self.trials = list()
         self.__figures = FigureList()
+
+    def clearFigs(self):
+        self.clearSimulationFigs()
+        self.clearTrialFigs()
+
+    def clearSimulationFigs(self):
+        self.__figures.clearFigs()
+
+    def clearTrialFigs(self):
+        for trial in self.trials:
+            trial.clearFigs()
 
     def deepCopyOfSimShallowCopyTrials(self):
         newSimObj = Simulation()
@@ -104,6 +119,17 @@ class SimData:
         self.figureFolderPath = figureFolderPath
         self.__figures = FigureList()
         self.titlePattern = None
+
+    def clearFigs(self):
+        self.clearSimDataFigs()
+        self.clearSimulationFigs()
+
+    def clearSimDataFigs(self):
+        self.__figures.clearFigs()
+
+    def clearSimulationFigs(self):
+        for sim in self.sims:
+            sim.clearFigs()
 
     def addFigure(self, fig, title):
         self.__figures.addFigure("%sfigures/" % (self.figureFolderPath), fig, title)
