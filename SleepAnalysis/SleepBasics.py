@@ -256,6 +256,10 @@ def plotSleepStuff(data):
 
                     minVal = min(pre.min(), post.min())
                     maxVal = max(pre.max(), post.max())
+                    # make symetric around 0
+                    lim = max(abs(minVal), abs(maxVal))
+                    minVal = -lim
+                    maxVal = lim
                     if minVal == 0.0 and maxVal == 0.0:
                         minVal = -0.0001
                         maxVal = 0.0001
@@ -263,20 +267,25 @@ def plotSleepStuff(data):
                         for j in range(pre.shape[1]):
                             fig, axs = plt.subplots(1, 3)
                             try:
-                                im = axs[0].imshow(pre[i,j,:,:], aspect='auto', interpolation='none', vmin=minVal, vmax=maxVal)
+                                im = axs[0].imshow(pre[i,j,:,:], aspect='auto', interpolation='none', vmin=minVal, vmax=maxVal, cmap="coolwarm")
+                                # im = axs[0].imshow(pre[i,j,:,:], aspect='auto', interpolation='none', norm=colors.CenteredNorm(), cmap="coolwarm")
+                                # im = axs[0].pcolormesh(pre[i,j,:,:], norm=colors.CenteredNorm(), cmap="coolwarm")
                                 divider = make_axes_locatable(axs[0])
                                 cax = divider.append_axes('right', size='5%', pad=0.05)
                                 fig.colorbar(im, cax=cax, orientation='vertical')
                                 axs[0].set_title("PreSleep Weights")
 
-                                im = axs[1].imshow(post[i,j,:,:], aspect='auto', interpolation='none', vmin=minVal, vmax=maxVal)
+                                im = axs[1].imshow(post[i,j,:,:], aspect='auto', interpolation='none', vmin=minVal, vmax=maxVal, cmap="coolwarm")
+                                # im = axs[1].imshow(post[i,j,:,:], aspect='auto', interpolation='none', norm=colors.CenteredNorm(), cmap="coolwarm")
                                 divider = make_axes_locatable(axs[1])
                                 cax = divider.append_axes('right', size='5%', pad=0.05)
                                 fig.colorbar(im, cax=cax, orientation='vertical')
                                 axs[1].set_title("PostSleep Weights")
                                 
                                 diff = post[i,j,:,:] - pre[i,j,:,:]
-                                im = axs[2].imshow(diff, aspect='auto', interpolation='none', vmin=diff.min(), vmax=diff.max())
+                                lim = max(abs(diff.min()), abs(diff.max()))
+                                im = axs[2].imshow(diff, aspect='auto', interpolation='none', vmin=-lim, vmax=lim, cmap="coolwarm")
+                                # im = axs[2].imshow(diff, aspect='auto', interpolation='none', norm=colors.CenteredNorm(), cmap="coolwarm")
                                 divider = make_axes_locatable(axs[2])
                                 cax = divider.append_axes('right', size='5%', pad=0.05)
                                 fig.colorbar(im, cax=cax, orientation='vertical')
@@ -297,7 +306,21 @@ def plotSleepStuff(data):
                             trial.addFigure(fig, "weightVisualizations/layerWeights-%s_all/filter-%d-%d.png" % (layerName,i,j))
                     fig.suptitle("Presleep weight visualizations %s" % layerName)
                     # fig.tight_layout()
-                    trial.addFigure(fig, "weightVisualizations/preSleep-%s.png" % (layerName))
+
+            for layerName in trial.preWeights:
+                try:
+                    pre = trial.preWeights[layerName].ravel()
+                    post = trial.postWeights[layerName].ravel()
+                    diff = post - pre
+                    fig = plt.figure()
+                    plt.scatter(pre, diff)
+                    plt.xlabel("PreSleep weight magniture")
+                    plt.ylabel("Sleep Delta")
+                    plt.title(layerName)
+                    trial.addFigure(fig, "weightVisualizations/%s-differentialvsInitialWeight.png" % (layerName))
+                except Exception as e:
+                    print(e)
+                    code.interact(local=dict(globals(), **locals()))
 
             for layerName in trial.postWeights:
                 post = trial.postWeights[layerName]

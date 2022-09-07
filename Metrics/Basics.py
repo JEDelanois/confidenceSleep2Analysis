@@ -295,10 +295,11 @@ def plotMetricTable(datas, datsetNames=["task1TrainData"], timePoints=[0], metri
     mmin = means.min() - (0.05 * means.min())
     mmax = means.max() + (0.05 * means.max())
     plt.bar(np.arange(means.shape[0]), means)
-    plt.xticks(np.arange(means.shape[0]), yticks)
+    plt.xticks(np.arange(means.shape[0]), yticks, rotation=90)
     plt.ylim((mmin, mmax))
     plt.title("Mean %s" % (metricName))
     plt.ylabel(metricName)
+    plt.tight_layout()
 
 
 
