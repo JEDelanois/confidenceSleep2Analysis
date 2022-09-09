@@ -224,7 +224,7 @@ def plotSpecificTrialMetricOverDatasetValue(datas, datsetNames=["task1TrainData"
 # x-axis - dataset name
 # y-axis - certain time point for certain data object
 # every line corresponds the data set at a specific time point
-def plotMetricTable(datas, datsetNames=["task1TrainData"], timePoints=[0], metricName="confidence", timePointsPrettyNames=None, prettyXTicks=True, prettyFileName=None, prettyXLabel=None):
+def plotMetricTable(datas, modelNames=[], datsetNames=["task1TrainData"], timePoints=[0], metricName="confidence", timePointsPrettyNames=None, prettyXTicks=True, prettyFileName=None, prettyXLabel=None):
     # code.interact(local=dict(globals(), **locals()))
     assert len(datas) == len(timePoints)
     # code.interact(local=dict(globals(), **locals()))
@@ -237,7 +237,7 @@ def plotMetricTable(datas, datsetNames=["task1TrainData"], timePoints=[0], metri
             data.addFigure(fig, "%s-%s-imshow.png" % (prettyFileName, str(metricName)))
     else:
         for data in datas:
-            data.addFigure(fig, "%s-%s-imshow.png" % (str(datsetNames), str(metricName)))
+            data.addFigure(fig, "modelNames%s-DatasetNames%s-%s-imshow.png" % (str(datsetNames), str(datsetNames), str(metricName)))
 
     yticks = []
     table = []
