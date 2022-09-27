@@ -179,7 +179,7 @@ def plotTrialMetricOverDatasetValue(data, datsetNames=["task1TrainData"], datset
 # x-axis - datset name gets mapped to dataset value and plotted 
 # y-axis - metric value 
 # every line corresponds the data set at a specific time point
-def plotSpecificTrialMetricOverDatasetValue(datas, datsetNames=["task1TrainData"], datsetValues=[0], timePoints=[0], metricName="confidence", timePointsPrettyNames=None, prettyXTicks=True, prettyFileName=None, prettyXLabel=None):
+def plotSpecificTrialMetricOverDatasetValue(datas, datsetNames=["task1TrainData"], datsetValues=[0], timePoints=[0], metricName="confidence", timePointsPrettyNames=None, prettyXTicks=True, prettyFileName=None, prettyXLabel=None, lineStyles=["-"], lineColors=["tab:blue"]):
     # code.interact(local=dict(globals(), **locals()))
     assert len(datas) == len(timePoints)
 
@@ -207,7 +207,7 @@ def plotSpecificTrialMetricOverDatasetValue(datas, datsetNames=["task1TrainData"
                     metricValue = trial.data.datasetMetrics[datasetName][metricName][timePoint,1]
                     ys.append(metricValue)
 
-                plt.plot(xs,ys)
+                plt.plot(xs,ys, lineStyles[t], c=lineColors[t] )
                 if timePointsPrettyNames ==  None:
                     leg.append("TimePoint %s" % (str(timePoint)))
                 else:
