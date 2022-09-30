@@ -4,6 +4,7 @@ import numpy as np
 import copy
 import code
 from tabulate import tabulate
+import Utils.ConfigUtil
 
 
 
@@ -346,3 +347,28 @@ def plotMetricTable(datas, modelNames=[], datsetNames=["task1TrainData"], timePo
     
 
 
+def meanPerformanceAtTimeGenerator(timePoint=0, datasetNames=[], metricName="matlabAcc"):
+    def meanPerformanceAtTime(sim):
+        ret = []
+        for datasetName in datasetNames:
+            ret.append(sim.trials[0].data.datasetMetrics[datasetName][metricName][timePoint, 1])
+        return np.mean(ret)
+    return meanPerformanceAtTime
+
+# every sim gets the specifed value (x value)
+# metricFunction gets the value (y value)
+def plotMetricOverConfigValue(datas, configPath=["modifiers", 1, 1,"datasetPercentages", 0], simPerformanceFunction=lambda x:0, prettyFileName=None, datasNames=["Sim 1"], ylabel="matlabAcc", xlabel="Dataset Size", xscale="linear", title="Perofrmance"):
+    fig = plt.figure()
+    for data in datas:
+        # code.interact(local=dict(globals(), **locals()))
+        xValues = [Utils.ConfigUtil.getDictValueFromPath(sim.trials[0].config, configPath) for sim in data.sims]
+        yValues = [simPerformanceFunction(sim) for sim in data.sims]
+        data.addFigure(fig, prettyFileName)
+        plt.plot(xValues, yValues)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    ax = plt.gca()
+    ax.set_xscale(xscale)
+    plt.tight_layout()
+    plt.legend(datasNames)

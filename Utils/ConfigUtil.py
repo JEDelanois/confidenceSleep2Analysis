@@ -1,4 +1,5 @@
 import json
+import code
 
 
 # individual config helpers
@@ -39,3 +40,15 @@ def loadConfigsForSimulations(data):
             trial.config = loadConfigFromJson(configPath)
 
 
+
+def getDictValueFromPath(d, keyPath):
+    # cur is current object in dictionary
+    cur = d
+    try:
+        for i,key in enumerate(keyPath):
+            if i == len(keyPath) - 1: # if at last element we need to set
+                return cur[key]
+            else: # access sub dictionary 
+                cur = cur[key]
+    except:
+        code.interact(local=dict(globals(), **locals()))
