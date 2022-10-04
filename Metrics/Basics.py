@@ -348,18 +348,23 @@ def plotMetricTable(datas, modelNames=[], datsetNames=["task1TrainData"], timePo
 
 
 def meanPerformanceAtTimeGenerator(timePoint=0, datasetNames=[], metricName="matlabAcc"):
+
     def meanPerformanceAtTime(sim):
         ret = []
-        for datasetName in datasetNames:
-            ret.append(sim.trials[0].data.datasetMetrics[datasetName][metricName][timePoint, 1])
-        return np.mean(ret)
+        for trial in sim.trials:
+            trialPerf = []
+            for datasetName in datasetNames:
+                trialPerf.append(trial.data.datasetMetrics[datasetName][metricName][timePoint, 1])
+            ret.append(np.mean(trialPerf))
+        return np.mean(ret), np.std(ret)
+
     return meanPerformanceAtTime
 
 # every sim gets the specifed value (x value)
 # metricFunction gets the value (y value)
 # config path will be used for xValues if xvalues is not specified
 # xValues is the list of values where each entry is the x values for the coresponding simulations
-def plotMetricOverConfigValue(datas, xValuess=None, configPath=["modifiers", 1, 1,"datasetPercentages", 0], simPerformanceFunction=lambda x:0, prettyFileName=None, datasNames=["Sim 1"], lineData=None, ylabel="matlabAcc", xlabel="Dataset Size", xscale="linear", title="Perofrmance"):
+def plotMetricOverConfigValue(datas, xValuess=None, configPath=["modifiers", 1, 1,"datasetPercentages", 0], simPerformanceFunction=lambda x:0, prettyFileName=None, datasNames=["Sim 1"], lineData=None, ylabel="matlabAcc", xlabel="Dataset Size", xscale="linear", title="Perofrmance", alpha=0.1):
     fig = plt.figure()
     for i,data in enumerate(datas):
         # code.interact(local=dict(globals(), **locals()))
@@ -368,15 +373,19 @@ def plotMetricOverConfigValue(datas, xValuess=None, configPath=["modifiers", 1, 
         else:
             xValues = xValuess[i]
         yValues = [simPerformanceFunction(sim) for sim in data.sims]
+        # code.interact(local=dict(globals(), **locals()))
+        yMeans = np.array([t[0] for t in yValues])
+        yStds = np.array([t[1] for t in yValues])
         data.addFigure(fig, prettyFileName)
         if lineData is None:
-            plt.plot(xValues, yValues)
+            plt.plot(xValues, yMeans, label=datasNames[i])
         else:
-            plt.plot(xValues, yValues, lineData[i]["style"], c=lineData[i]["color"])
+            plt.plot(xValues, yMeans, lineData[i]["style"], c=lineData[i]["color"], label=datasNames[i])
+            plt.fill_between(xValues, yMeans+yStds, yMeans-yStds, color=lineData[i]["color"], alpha=alpha)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
     ax = plt.gca()
     ax.set_xscale(xscale)
     plt.tight_layout()
-    plt.legend(datasNames)
+    plt.legend()

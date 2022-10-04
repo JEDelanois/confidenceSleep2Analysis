@@ -41,7 +41,7 @@ lineData.append({})
 lineData[-1]["style"] = "--"
 lineData[-1]["color"] = "tab:blue"
 datas.append(dataAll)
-xValuess.append(datas[-1].paramPathValueSetDicts[0]["values"])
+xValuess.append(datas[-1].paramPathValueSetDicts[1]["values"])
 
 dataBlur = SimData(figureFolderPath="../figures/" )
 dataBlur.createSimulationStructureSweepFolder(
@@ -54,7 +54,7 @@ lineData.append({})
 lineData[-1]["style"] = "--"
 lineData[-1]["color"] = "tab:orange"
 datas.append(dataBlur)
-xValuess.append(datas[-1].paramPathValueSetDicts[0]["values"])
+xValuess.append(datas[-1].paramPathValueSetDicts[1]["values"])
 
 dataGn = SimData(figureFolderPath="../figures/" )
 dataGn.createSimulationStructureSweepFolder(
@@ -67,7 +67,7 @@ lineData.append({})
 lineData[-1]["style"] = "--"
 lineData[-1]["color"] = "tab:green"
 datas.append(dataGn)
-xValuess.append(datas[-1].paramPathValueSetDicts[0]["values"])
+xValuess.append(datas[-1].paramPathValueSetDicts[1]["values"])
 
 dataSp = SimData(figureFolderPath="../figures/" )
 dataSp.createSimulationStructureSweepFolder(
@@ -80,60 +80,60 @@ lineData.append({})
 lineData[-1]["style"] = "--"
 lineData[-1]["color"] = "tab:red"
 datas.append(dataSp)
-xValuess.append(datas[-1].paramPathValueSetDicts[0]["values"])
-# ____________________________________
+xValuess.append(datas[-1].paramPathValueSetDicts[1]["values"])
+# # ____________________________________
 
-dataAllSleep = SimData(figureFolderPath="../figures/" )
-dataAllSleep.createSimulationStructureSweepFolder(
-    "../simulationSweep/All/", 
-    "", 
-    titlePatternSameAsFilePattern=False
-    )
-datasNames.append("Finetune All Distortions + Sleep")
-lineData.append({})
-lineData[-1]["style"] = "-"
-lineData[-1]["color"] = "tab:blue"
-datas.append(dataAllSleep)
-xValuess.append(datas[-1].paramPathValueSetDicts[0]["prettyValues"])
+# dataAllSleep = SimData(figureFolderPath="../figures/" )
+# dataAllSleep.createSimulationStructureSweepFolder(
+    # "../simulationSweep/All/", 
+    # "", 
+    # titlePatternSameAsFilePattern=False
+    # )
+# datasNames.append("Finetune All Distortions + Sleep")
+# lineData.append({})
+# lineData[-1]["style"] = "-"
+# lineData[-1]["color"] = "tab:blue"
+# datas.append(dataAllSleep)
+# xValuess.append(datas[-1].paramPathValueSetDicts[1]["prettyValues"])
 
-dataBlurSleep = SimData(figureFolderPath="../figures/" )
-dataBlurSleep.createSimulationStructureSweepFolder(
-    "../simulationSweep/Blur/", 
-    "", 
-    titlePatternSameAsFilePattern=False
-    )
-datasNames.append("Finetune Blur + Sleep")
-lineData.append({})
-lineData[-1]["style"] = "-"
-lineData[-1]["color"] = "tab:orange"
-datas.append(dataBlurSleep)
-xValuess.append(datas[-1].paramPathValueSetDicts[0]["prettyValues"])
+# dataBlurSleep = SimData(figureFolderPath="../figures/" )
+# dataBlurSleep.createSimulationStructureSweepFolder(
+    # "../simulationSweep/Blur/", 
+    # "", 
+    # titlePatternSameAsFilePattern=False
+    # )
+# datasNames.append("Finetune Blur + Sleep")
+# lineData.append({})
+# lineData[-1]["style"] = "-"
+# lineData[-1]["color"] = "tab:orange"
+# datas.append(dataBlurSleep)
+# xValuess.append(datas[-1].paramPathValueSetDicts[1]["prettyValues"])
 
-dataGnSleep = SimData(figureFolderPath="../figures/" )
-dataGnSleep.createSimulationStructureSweepFolder(
-    "../simulationSweep/Gn/", 
-    "", 
-    titlePatternSameAsFilePattern=False
-    )
-datasNames.append("Finetune Gn + Sleep")
-lineData.append({})
-lineData[-1]["style"] = "-"
-lineData[-1]["color"] = "tab:green"
-datas.append(dataGnSleep)
-xValuess.append(datas[-1].paramPathValueSetDicts[0]["prettyValues"])
+# dataGnSleep = SimData(figureFolderPath="../figures/" )
+# dataGnSleep.createSimulationStructureSweepFolder(
+    # "../simulationSweep/Gn/", 
+    # "", 
+    # titlePatternSameAsFilePattern=False
+    # )
+# datasNames.append("Finetune Gn + Sleep")
+# lineData.append({})
+# lineData[-1]["style"] = "-"
+# lineData[-1]["color"] = "tab:green"
+# datas.append(dataGnSleep)
+# xValuess.append(datas[-1].paramPathValueSetDicts[1]["prettyValues"])
 
-dataSpSleep = SimData(figureFolderPath="../figures/" )
-dataSpSleep.createSimulationStructureSweepFolder(
-    "../simulationSweep/Sp/", 
-    "", 
-    titlePatternSameAsFilePattern=False
-    )
-datasNames.append("Finetune Sp + Sleep")
-lineData.append({})
-lineData[-1]["style"] = "-"
-lineData[-1]["color"] = "tab:red"
-datas.append(dataSpSleep)
-xValuess.append(datas[-1].paramPathValueSetDicts[0]["prettyValues"])
+# dataSpSleep = SimData(figureFolderPath="../figures/" )
+# dataSpSleep.createSimulationStructureSweepFolder(
+    # "../simulationSweep/Sp/", 
+    # "", 
+    # titlePatternSameAsFilePattern=False
+    # )
+# datasNames.append("Finetune Sp + Sleep")
+# lineData.append({})
+# lineData[-1]["style"] = "-"
+# lineData[-1]["color"] = "tab:red"
+# datas.append(dataSpSleep)
+# xValuess.append(datas[-1].paramPathValueSetDicts[1]["prettyValues"])
 
 
 for data in datas:
@@ -207,13 +207,13 @@ for i,datasetNames in enumerate(dataGroups):
 
 for i,datasetNames in enumerate(dataGroups):
     gn = getGroupName(datasetNames)
-    func = Metrics.Basics.meanPerformanceAtTimeGenerator(timePoint=-1, datasetNames=datasetNames, metricName="matlabAcc")
+    func = Metrics.Basics.meanPerformanceAtTimeGenerator(timePoint=-1, datasetNames=datasetNames, metricName="matlabAcc", alpha=0.1)
     Metrics.Basics.plotMetricOverConfigValue(datas, xValuess=xValuess, configPath=["modifiers", 1, 1,"datasetPercentages", 0], simPerformanceFunction=func, prettyFileName="performance_%s.png" % gn, datasNames=datasNames, lineData=lineData, ylabel="matlabAcc", xlabel="Dataset Size", xscale="log", title="%s Perofrmance" % gn)
 
-func = Metrics.Basics.meanPerformanceAtTimeGenerator(timePoint=-1, datasetNames=allDatasets, metricName="matlabAcc")
+func = Metrics.Basics.meanPerformanceAtTimeGenerator(timePoint=-1, datasetNames=allDatasets, metricName="matlabAcc", alpha=0.1)
 Metrics.Basics.plotMetricOverConfigValue(datas, xValuess=xValuess, configPath=["modifiers", 1, 1,"datasetPercentages", 0], simPerformanceFunction=func, prettyFileName="performance_%s.png" % "All", datasNames=datasNames, lineData=lineData, ylabel="matlabAcc", xlabel="Dataset Size", xscale="log", title="%s Perofrmance" % "All")
 
-func = Metrics.Basics.meanPerformanceAtTimeGenerator(timePoint=-1, datasetNames=allDatasets, metricName="matlabAcc")
+func = Metrics.Basics.meanPerformanceAtTimeGenerator(timePoint=-1, datasetNames=allDatasets, metricName="matlabAcc", alpha=0.1)
 Metrics.Basics.plotMetricOverConfigValue(datas, xValuess=xValuess, configPath=["modifiers", 1, 1,"datasetPercentages", 0], simPerformanceFunction=func, prettyFileName="performance_%s.png" % "All", datasNames=datasNames, lineData=lineData, ylabel="matlabAcc", xlabel="Dataset Size", xscale="log", title="%s Perofrmance" % "All")
 
 for data in datas:
