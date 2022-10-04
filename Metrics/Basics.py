@@ -357,14 +357,22 @@ def meanPerformanceAtTimeGenerator(timePoint=0, datasetNames=[], metricName="mat
 
 # every sim gets the specifed value (x value)
 # metricFunction gets the value (y value)
-def plotMetricOverConfigValue(datas, configPath=["modifiers", 1, 1,"datasetPercentages", 0], simPerformanceFunction=lambda x:0, prettyFileName=None, datasNames=["Sim 1"], ylabel="matlabAcc", xlabel="Dataset Size", xscale="linear", title="Perofrmance"):
+# config path will be used for xValues if xvalues is not specified
+# xValues is the list of values where each entry is the x values for the coresponding simulations
+def plotMetricOverConfigValue(datas, xValuess=None, configPath=["modifiers", 1, 1,"datasetPercentages", 0], simPerformanceFunction=lambda x:0, prettyFileName=None, datasNames=["Sim 1"], lineData=None, ylabel="matlabAcc", xlabel="Dataset Size", xscale="linear", title="Perofrmance"):
     fig = plt.figure()
-    for data in datas:
+    for i,data in enumerate(datas):
         # code.interact(local=dict(globals(), **locals()))
-        xValues = [Utils.ConfigUtil.getDictValueFromPath(sim.trials[0].config, configPath) for sim in data.sims]
+        if xValuess is None:
+            xValues = [Utils.ConfigUtil.getDictValueFromPath(sim.trials[0].config, configPath) for sim in data.sims]
+        else:
+            xValues = xValuess[i]
         yValues = [simPerformanceFunction(sim) for sim in data.sims]
         data.addFigure(fig, prettyFileName)
-        plt.plot(xValues, yValues)
+        if lineData is None:
+            plt.plot(xValues, yValues)
+        else:
+            plt.plot(xValues, yValues, lineData[i]["style"], c=lineData[i]["color"])
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)

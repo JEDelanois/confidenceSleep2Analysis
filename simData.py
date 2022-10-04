@@ -1,5 +1,6 @@
 import os
 import pickle
+import code
 
 class FigureData:
     def __init__(self, FolderPath, Figure, Title):
@@ -170,25 +171,27 @@ class SimData:
     def createSimulationStructureSweepFolder(self, pathToSweepFolder, titlePattern, titlePatternSameAsFilePattern=False):
         # this pickle file should be a list of ParamPathValueSet from the simData.py class from the simulation code
         self.figureFolderPath = pathToSweepFolder + "/"
-        paramPathValueSetDicts = pickle.load(open(pathToSweepFolder + "/paramPathValueSets.pkl", "rb"))
+        self.paramPathValueSetDicts = pickle.load(open(pathToSweepFolder + "/paramPathValueSets.pkl", "rb"))
 
         filePattern = pathToSweepFolder + "/"
         listOfVariables = []
         trials = [0] # default to zero seed
 
         paramIdx = 0
-        for paramPathValueSetDict in paramPathValueSetDicts:
+        for paramPathValueSetDict in self.paramPathValueSetDicts:
             # if param id is included in the file name string then include
             if paramPathValueSetDict["includeParamId"]:
                 if not (filePattern ==  "" or filePattern == pathToSweepFolder+"/"): # then there are already parameters in string
                     filePattern += "_"
                 filePattern += "%s-{%s}" % (paramPathValueSetDict["paramId"],  str(paramIdx))
                 paramIdx += 1
-                listOfVariables.append(paramPathValueSetDict["values"])
+                # listOfVariables.append(paramPathValueSetDict["values"])
+                listOfVariables.append(paramPathValueSetDict["prettyValues"])
 
             # if parameter is the seed, then include in seeds
             if paramPathValueSetDict["paramId"] == "seed" or paramPathValueSetDict["isSeed"]:
-                trials = paramPathValueSetDict["values"]
+                # trials = paramPathValueSetDict["values"]
+                trials = paramPathValueSetDict["prettyValues"]
 
         if titlePatternSameAsFilePattern:
             titlePattern = filePattern
