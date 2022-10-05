@@ -115,7 +115,7 @@ class Simulation:
         self.__figures.saveFigures()        
 
 class SimData:
-    def __init__(self, figureFolderPath="./"):
+    def __init__(self, figureFolderPath=None):
         self.sims = list()
         self.figureFolderPath = figureFolderPath
         self.__figures = FigureList()
@@ -170,7 +170,8 @@ class SimData:
     # it leverages the parameter values stored by the simSweep.py code and leverages custom classes implemented there
     def createSimulationStructureSweepFolder(self, pathToSweepFolder, titlePattern, titlePatternSameAsFilePattern=False):
         # this pickle file should be a list of ParamPathValueSet from the simData.py class from the simulation code
-        self.figureFolderPath = pathToSweepFolder + "/"
+        if self.figureFolderPath is None:
+            self.figureFolderPath = pathToSweepFolder + "/"
         self.paramPathValueSetDicts = pickle.load(open(pathToSweepFolder + "/paramPathValueSets.pkl", "rb"))
 
         filePattern = pathToSweepFolder + "/"
