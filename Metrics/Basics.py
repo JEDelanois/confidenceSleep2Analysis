@@ -11,7 +11,8 @@ import Utils.ConfigUtil
 def plotAllTrialMetric(data, datsetName="task1TrainData", metricName="confidence"):
     print("Plotting %s" % metricName)
     fig = plt.figure()
-    data.addFigure(fig, "%s-%s.pdf" % (datsetName, metricName))
+    # data.addFigure(fig, "%s-%s.pdf" % (datsetName, metricName))
+    data.addFigure(fig, "%s-%s.png" % (datsetName, metricName))
     totalNumTrials = 0
     numImproved = 0
     numDecreased = 0
@@ -39,7 +40,8 @@ def plotTrialMetrics(data, datsetNames=["task1TrainData"], metricNames=["confide
             if prettyFileName is not None:
                 trial.addFigure(fig, prettyFileName)
             else:
-                trial.addFigure(fig, "%s-%s-line.pdf" % (str(datsetNames), str(metricNames)))
+                # trial.addFigure(fig, "%s-%s-line.pdf" % (str(datsetNames), str(metricNames)))
+                trial.addFigure(fig, "%s-%s-line.png" % (str(datsetNames), str(metricNames)))
 
             for datasetName in datsetNames:
                 for metricName in metricNames:
@@ -58,7 +60,8 @@ def plotTrialMetricsDiff(data, datsetNames=["task1TrainData"], metricNames=["con
             if prettyFileName is not None:
                 trial.addFigure(fig, prettyFileName)
             else:
-                trial.addFigure(fig, "%s-%s-line.pdf" % (str(datsetNames), str(metricNames)))
+                # trial.addFigure(fig, "%s-%s-line.pdf" % (str(datsetNames), str(metricNames)))
+                trial.addFigure(fig, "%s-%s-line.png" % (str(datsetNames), str(metricNames)))
 
             axs[0].set_title("Initial %d - Final %d" % (initialPoint, finalPoint))
 
@@ -96,7 +99,8 @@ def barTrialMetrics(data, datsetNames=["task1TrainData"], metricNames=["confiden
             if prettyFileName is not None:
                 trial.addFigure(fig, prettyFileName)
             else:
-                trial.addFigure(fig, "%s-%s-bar.pdf" % (str(datsetNames), str(metricNames)))
+                # trial.addFigure(fig, "%s-%s-bar.pdf" % (str(datsetNames), str(metricNames)))
+                trial.addFigure(fig, "%s-%s-bar.png" % (str(datsetNames), str(metricNames)))
 
             shiftCounter = 0
             leg = []
@@ -151,7 +155,8 @@ def plotTrialMetricOverDatasetValue(data, datsetNames=["task1TrainData"], datset
             if prettyFileName is not None:
                 trial.addFigure(fig, prettyFileName)
             else:
-                trial.addFigure(fig, "%s-%s-metricOverDatasetValue.pdf" % (str(datsetNames), str(metricName)))
+                # trial.addFigure(fig, "%s-%s-metricOverDatasetValue.pdf" % (str(datsetNames), str(metricName)))
+                trial.addFigure(fig, "%s-%s-metricOverDatasetValue.png" % (str(datsetNames), str(metricName)))
 
             for t,timePoint in enumerate(timePoints):
                 xs = []
@@ -192,7 +197,8 @@ def plotSpecificTrialMetricOverDatasetValue(datas, datsetNames=["task1TrainData"
             data.addFigure(fig, prettyFileName)
     else:
         for data in datas:
-            data.addFigure(fig, "%s-%s-specificMetricOverDatasetValue.pdf" % (str(datsetNames), str(metricName)))
+            # data.addFigure(fig, "%s-%s-specificMetricOverDatasetValue.pdf" % (str(datsetNames), str(metricName)))
+            data.addFigure(fig, "%s-%s-specificMetricOverDatasetValue.png" % (str(datsetNames), str(metricName)))
     for t,(data, timePoint) in enumerate(zip(datas,timePoints)):
         for sim in data.sims:
             for trial in sim.trials:
