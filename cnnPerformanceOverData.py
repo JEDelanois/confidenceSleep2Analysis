@@ -89,7 +89,7 @@ dataAllSleep.createSimulationStructureSweepFolder(
     "", 
     titlePatternSameAsFilePattern=False
     )
-datasNames.append("Sleep + Finetune All Distortions")
+datasNames.append("Finetune All Distortions + Sleep")
 lineData.append({})
 lineData[-1]["style"] = "-"
 lineData[-1]["color"] = "tab:blue"
@@ -102,7 +102,7 @@ dataBlurSleep.createSimulationStructureSweepFolder(
     "", 
     titlePatternSameAsFilePattern=False
     )
-datasNames.append("Sleep + Finetune Blur")
+datasNames.append("Finetune Blur + Sleep")
 lineData.append({})
 lineData[-1]["style"] = "-"
 lineData[-1]["color"] = "tab:orange"
@@ -115,7 +115,7 @@ dataGnSleep.createSimulationStructureSweepFolder(
     "", 
     titlePatternSameAsFilePattern=False
     )
-datasNames.append("Sleep + Finetune Gn")
+datasNames.append("Finetune Gn + Sleep")
 lineData.append({})
 lineData[-1]["style"] = "-"
 lineData[-1]["color"] = "tab:green"
@@ -128,15 +128,49 @@ dataSpSleep.createSimulationStructureSweepFolder(
     "", 
     titlePatternSameAsFilePattern=False
     )
-datasNames.append("Sleep + Finetune Sp")
+datasNames.append("Finetune Sp + Sleep")
 lineData.append({})
 lineData[-1]["style"] = "-"
 lineData[-1]["color"] = "tab:red"
 datas.append(dataSpSleep)
 xValuess.append(datas[-1].paramPathValueSetDicts[1]["prettyValues"])
 
+# horizontal lines
+horizontalLineDatas = []
+horizontalDatasNames = []
+horizontalLineData = []
 
-for data in datas:
+baseline = SimData(figureFolderPath="../figures/" )
+baseline.createSimulationStructureFromPattern( \
+    "/bazhlab/edelanois/cnnSleep/60/simulations/baseline/0/" \
+    , "Baseline" \
+    ,[] \
+    , range(0,1)) 
+horizontalDatasNames.append("Baseline")
+horizontalLineData.append({})
+horizontalLineData[-1]["style"] = "-"
+horizontalLineData[-1]["color"] = "k"
+horizontalLineDatas.append(baseline)
+
+sleepOnly = SimData(figureFolderPath="../figures/" )
+sleepOnly.createSimulationStructureFromPattern( \
+    "/bazhlab/edelanois/cnnSleep/54/simulations/genAlgo/sim1948/" \
+    , "Sleep Only" \
+    ,[] \
+    , range(0,1)) 
+horizontalDatasNames.append("Sleep Only")
+horizontalLineData.append({})
+horizontalLineData[-1]["style"] = "-"
+horizontalLineData[-1]["color"] = "tab:pink"
+horizontalLineDatas.append(sleepOnly)
+
+allDatas = []
+for d in datas:
+    allDatas.append(d)
+for d in horizontalLineDatas:
+    allDatas.append(d)
+
+for data in allDatas:
     Utils.ConfigUtil.loadConfigsForSimulations(data)
 
 
@@ -200,7 +234,7 @@ for i,datasetNames in enumerate(dataGroups):
     metricFiles = ["loss.txt", "matlabAccuracy.txt"]
     print(datasetNames)
     for metricName, metricFile in zip(metricNames, metricFiles):
-        for data in datas:
+        for data in allDatas:
             Metrics.LoadData.loadMetric(data, metricName=metricName, metricFile=metricFile, forceDatasetLoadFolders=datasetNames, detectMemberDataFolders=False)
             # Metrics.Basics.plotTrialMetrics(data, datsetNames=datasetNames, metricNames=[metricName])
             # Metrics.Basics.plotTrialMetricOverDatasetValue(data, datsetNames=datasetNames, datsetValues=valueGroup, timePoints=[0,-1], metricName=metricName, timePointsPrettyNames=["Post Training", "Post Sleep"], prettyFileName=None)
@@ -208,13 +242,13 @@ for i,datasetNames in enumerate(dataGroups):
 for i,datasetNames in enumerate(dataGroups):
     gn = getGroupName(datasetNames)
     func = Metrics.Basics.meanPerformanceAtTimeGenerator(timePoint=-1, datasetNames=datasetNames, metricName="matlabAcc")
-    Metrics.Basics.plotMetricOverConfigValue(datas, xValuess=xValuess, configPath=["modifiers", 1, 1,"datasetPercentages", 0], simPerformanceFunction=func, prettyFileName="performance_%s.png" % gn, datasNames=datasNames, lineData=lineData, ylabel="matlabAcc", xlabel="Dataset Size", xscale="log", title="%s Perofrmance" % gn, alpha=0.1)
+    Metrics.Basics.plotMetricOverConfigValue(datas, horizontalLineDatas=horizontalLineDatas, xValuess=xValuess, configPath=["modifiers", 1, 1,"datasetPercentages", 0], simPerformanceFunction=func, prettyFileName="performance_%s.png" % gn, datasNames=datasNames, horizontalDatasNames=horizontalDatasNames, lineData=lineData, horizontalLineData=horizontalLineData, ylabel="matlabAcc", xlabel="Dataset Size", xscale="log", title="%s Perofrmance" % gn, alpha=0.1)
 
 func = Metrics.Basics.meanPerformanceAtTimeGenerator(timePoint=-1, datasetNames=allDatasets, metricName="matlabAcc")
-Metrics.Basics.plotMetricOverConfigValue(datas, xValuess=xValuess, configPath=["modifiers", 1, 1,"datasetPercentages", 0], simPerformanceFunction=func, prettyFileName="performance_%s.png" % "All", datasNames=datasNames, lineData=lineData, ylabel="matlabAcc", xlabel="Dataset Size", xscale="log", title="%s Perofrmance" % "All", alpha=0.1)
+Metrics.Basics.plotMetricOverConfigValue(datas, horizontalLineDatas=horizontalLineDatas, xValuess=xValuess, configPath=["modifiers", 1, 1,"datasetPercentages", 0], simPerformanceFunction=func, prettyFileName="performance_%s.png" % "All", datasNames=datasNames, horizontalDatasNames=horizontalDatasNames, lineData=lineData, horizontalLineData=horizontalLineData, ylabel="matlabAcc", xlabel="Dataset Size", xscale="log", title="%s Perofrmance" % "All", alpha=0.1)
 
-func = Metrics.Basics.meanPerformanceAtTimeGenerator(timePoint=-1, datasetNames=allDatasets, metricName="matlabAcc")
-Metrics.Basics.plotMetricOverConfigValue(datas, xValuess=xValuess, configPath=["modifiers", 1, 1,"datasetPercentages", 0], simPerformanceFunction=func, prettyFileName="performance_%s.png" % "All", datasNames=datasNames, lineData=lineData, ylabel="matlabAcc", xlabel="Dataset Size", xscale="log", title="%s Perofrmance" % "All", alpha=0.1)
+# func = Metrics.Basics.meanPerformanceAtTimeGenerator(timePoint=-1, datasetNames=allDatasets, metricName="matlabAcc")
+# Metrics.Basics.plotMetricOverConfigValue(datas, horizontalLineDatas=horizontalLineDatas, xValuess=xValuess, configPath=["modifiers", 1, 1,"datasetPercentages", 0], simPerformanceFunction=func, prettyFileName="performance_%s.png" % "All", datasNames=datasNames, horizontalDatasNames=horizontalDatasNames, lineData=lineData, horizontalLineData=horizontalLineData, ylabel="matlabAcc", xlabel="Dataset Size", xscale="log", title="%s Perofrmance" % "All", alpha=0.1)
 
 # for data in datas:
     # data.saveFigures()

@@ -370,7 +370,7 @@ def meanPerformanceAtTimeGenerator(timePoint=0, datasetNames=[], metricName="mat
 # metricFunction gets the value (y value)
 # config path will be used for xValues if xvalues is not specified
 # xValues is the list of values where each entry is the x values for the coresponding simulations
-def plotMetricOverConfigValue(datas, xValuess=None, configPath=["modifiers", 1, 1,"datasetPercentages", 0], simPerformanceFunction=lambda x:0, prettyFileName=None, datasNames=["Sim 1"], lineData=None, ylabel="matlabAcc", xlabel="Dataset Size", xscale="linear", title="Perofrmance", alpha=0.1):
+def plotMetricOverConfigValue(datas, horizontalLineDatas=None , xValuess=None, configPath=["modifiers", 1, 1,"datasetPercentages", 0], simPerformanceFunction=lambda x:0, prettyFileName=None, datasNames=["Sim 1"], horizontalDatasNames=["Baseline"], lineData=None, horizontalLineData=None, ylabel="matlabAcc", xlabel="Dataset Size", xscale="linear", title="Perofrmance", alpha=0.1):
     fig = plt.figure()
     for i,data in enumerate(datas):
         # code.interact(local=dict(globals(), **locals()))
@@ -388,10 +388,26 @@ def plotMetricOverConfigValue(datas, xValuess=None, configPath=["modifiers", 1, 
         else:
             plt.plot(xValues, yMeans, lineData[i]["style"], c=lineData[i]["color"], label=datasNames[i])
             plt.fill_between(xValues, yMeans+yStds, yMeans-yStds, color=lineData[i]["color"], alpha=alpha)
+
+    if horizontalLineDatas is not None:
+        for i,data in enumerate(horizontalLineDatas):
+            # code.interact(local=dict(globals(), **locals()))
+            meanValue, stdValue = simPerformanceFunction(data.sims[0])
+            # code.interact(local=dict(globals(), **locals()))
+            yMeans = np.array([meanValue] * len(xValues))
+            yStds = np.array([stdValue] * len(xValues))
+            if horizontalLineData is None:
+                plt.plot(xValues, yMeans, label=horizontalDatasNames[i])
+            else:
+                plt.plot(xValues, yMeans, horizontalLineData[i]["style"], c=horizontalLineData[i]["color"], label=horizontalDatasNames[i])
+                plt.fill_between(xValues, yMeans+yStds, yMeans-yStds, color=horizontalLineData[i]["color"], alpha=alpha)
+
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
     ax = plt.gca()
     ax.set_xscale(xscale)
+    # plt.legend()
+    # plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    plt.legend(loc='lower right', fontsize="small")
     plt.tight_layout()
-    plt.legend()
