@@ -266,7 +266,19 @@ def plotSleepStuff(data):
                     for i in range(pre.shape[0]):
                         for j in range(pre.shape[1]):
                             fig, axs = plt.subplots(1, 3)
+                            fig.suptitle("filter-%d-%d" % (i,j))
                             try:
+                                # set plotwise min and max vals
+                                # if you want global min / max vals then 
+                                minVal = min(pre[i,j,:,:].min(), post[i,j,:,:].min())
+                                maxVal = min(pre[i,j,:,:].max(), post[i,j,:,:].max())
+                                lim = max(abs(minVal), abs(maxVal))
+                                minVal = -lim
+                                maxVal = lim
+                                if minVal == 0.0 and maxVal == 0.0:
+                                    minVal = -0.0001
+                                    maxVal = 0.0001
+
                                 im = axs[0].imshow(pre[i,j,:,:], aspect='auto', interpolation='none', vmin=minVal, vmax=maxVal, cmap="coolwarm")
                                 # im = axs[0].imshow(pre[i,j,:,:], aspect='auto', interpolation='none', norm=colors.CenteredNorm(), cmap="coolwarm")
                                 # im = axs[0].pcolormesh(pre[i,j,:,:], norm=colors.CenteredNorm(), cmap="coolwarm")
@@ -304,7 +316,6 @@ def plotSleepStuff(data):
                                 axs[jj].spines['bottom'].set_visible(False)
                                 axs[jj].spines['left'].set_visible(False)
                             trial.addFigure(fig, "weightVisualizations/layerWeights-%s_all/filter-%d-%d.png" % (layerName,i,j))
-                    fig.suptitle("Presleep weight visualizations %s" % layerName)
                     # fig.tight_layout()
 
             for layerName in trial.preWeights:
