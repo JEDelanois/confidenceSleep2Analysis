@@ -418,8 +418,95 @@ def getKMeansDiff(
                 plotKmeansClassifications(trial, allActivations[i], kmeans, allLabels, markers, folderPrefix="/kmeansDiff/%s/training-%s/testing-%s/layer%d" % (outputFolderPrefix,str(trainDatasetNames), str(datasetNames), i))
                 # code.interact(local=dict(globals(), **locals()))
 
+# def getConvLayerGradientMetric(
+    # data
+    # , modelName="model"
+    # , modelNameloadModelPaths=["/stateDict/modelStateDict0.pth"]
+    # , linePrettyNames = ["Post training"]
+    # , datasetNames=["task1ValidData", "task1ValidData-Blur-1", "task1ValidData-Blur-2", "task1ValidData-Blur-3"]
+    # , datsetValues=[0, 1, 2, 3]
+    # , prettyXTicks=True
+    # ):
+
+
+    # for sim in data.sims:
+        # for trial in sim.trials: 
+            # plts = [plt.subplots(1, 2) for i in range(5)]
+            # cmap = plt.get_cmap("tab10")
+            # for pathIdx,modelNameloadModelPath in enumerate(modelNameloadModelPaths):
+                # simObj = Simulation(trial.config, **trial.config)
+                # simObj.createSimMembers(trial.config["members"], trial.config["modifiers"], trial.config["stages"], cachedSimMembers={})
+                # model = simObj.members[modelName]
+                # modelNameloadModelPathFull = trial.path + modelNameloadModelPath
+
+                # model.load_state_dict(torch.load(modelNameloadModelPathFull, map_location=devices.comp))
+                # datasets = [simObj.members[d] for d in datasetNames]
+                # datasets = [getAllDataFromDataset(d) for d in datasets]
+
+                # xs = []
+                # Means = None
+                # Stds = None
+                # prettyXTicks = []
+                # for dIdx, dataset in enumerate(datasets):
+                    # prettyXTicks.append("%s %s" % (datasetNames[dIdx], str(datsetValues[dIdx])))
+                    # allActivations, allLabels, markers  = getActivationsForDatasets(model, [dataset], datasetSymbols=None, flatten=False)
+                    # if Means is None and Stds is None:
+                        # # Means = [[0.0] * len(datasetNames)] * len(allActivations) # every layer has its own mean and std
+                        # # Stds = [[0.0] * len(datasetNames)] * len(allActivations) # every layer has its own mean and std
+                        # Means = [[0.0] * len(datasetNames) for ii in range(len(allActivations))] # every layer has its own mean and std
+                        # Stds = [[0.0] * len(datasetNames) for ii in range(len(allActivations))] # every layer has its own mean and std
+                    # xs.append(datsetValues[dIdx])
+                    # for lIdx,layerActivations in enumerate(allActivations):
+                        # if len(layerActivations.shape) <= 2: # if feed forward then skip
+                            # continue
+                        # channels = layerActivations.size()[1]
+                        # sobelV = torch.tensor([[1, 2, 1], [0, 0, 0], [-1, -2, -1]], dtype=torch.float32) / 4.0
+                        # sobelKernelV = sobelV.unsqueeze(0).expand(1, 1, 3, 3)
+                        # sobelH = sobelV.clone().T
+                        # sobelKernelH = sobelH.unsqueeze(0).expand(1, 1, 3, 3)
+                        # channelValues = torch.tensor([])
+                        # for c in range(channels):
+                            # try:
+                                # channelData = layerActivations[:, c, :, :].unsqueeze(1)
+                            # except:
+                                # code.interact(local=dict(globals(), **locals()))
+                            # gradV = torch.nn.functional.conv2d(channelData, sobelKernelV, bias=None, stride=1, padding=0, dilation=1, groups=1)
+                            # gradH = torch.nn.functional.conv2d(channelData, sobelKernelH, bias=None, stride=1, padding=0, dilation=1, groups=1)
+
+                            # ssum = (gradV.pow(2) + gradH.pow(2)).pow(0.5)
+                            # ssum = ssum[torch.where(ssum != 0)] # grab nonnegative gradient values
+                            # channelValues = torch.cat([channelValues, ssum], dim=0) # flattens all features to single dimmension
+
+                        # Means[lIdx][dIdx] = channelValues.mean().item()
+                        # # Stds[lIdx][dIdx] = channelValues.std().item()
+                        # Stds[lIdx][dIdx] = channelValues.std().item() / Means[lIdx][dIdx]
+
+                # for i in range(len(Means)): # i is layer index
+                    # Means[i] = np.array(Means[i])
+                    # Stds[i] = np.array(Stds[i])
+
+                    # plts[i][1][0].plot(xs, Means[i], color=cmap(pathIdx))
+                    # plts[i][1][0].set_title("Means")
+                    # plts[i][1][1].plot(xs, Stds[i], color=cmap(pathIdx))
+                    # plts[i][1][1].set_title("Normalized Stds")
+
+                    # # fig= plt.figure()
+                    # # plt.plot(xs, Means[i], color="tab:orange")
+                    # # plt.fill_between(xs, Means[i]+Stds[i], Means[i]-Stds[i], color="tab:orange", alpha=0.4)
+                    # # if prettyXTicks:
+                        # # plt.xticks(xs, prettyXTicks, rotation = 90)
+                    # # plt.tight_layout()
+                    # # trial.addFigure(fig, "/features/gradientMetric/%s/layer%d/gradientMEtricOverDataset.png" % (str(datasetNames), i))
+            # for i in  range(len(plts)):
+                # if prettyXTicks:
+                    # plts[i][1][0].set_xticks(xs, prettyXTicks, rotation = 90)
+                    # plts[i][1][1].set_xticks(xs, prettyXTicks, rotation = 90)
+                # plts[i][1][1].legend(linePrettyNames, loc='center left', bbox_to_anchor=(1, 0.5))
+                # plts[i][0].tight_layout()
+                # trial.addFigure(plts[i][0], "/features/gradientMetric/%s/layer%d/gradientMEtricOverDataset.png" % (str(datasetNames), i))
+
 def getConvLayerGradientMetric(
-    data
+    datas
     , modelName="model"
     , modelNameloadModelPaths=["/stateDict/modelStateDict0.pth"]
     , linePrettyNames = ["Post training"]
@@ -428,12 +515,13 @@ def getConvLayerGradientMetric(
     , prettyXTicks=True
     ):
 
-
-    for sim in data.sims:
-        for trial in sim.trials: 
-            plts = [plt.subplots(1, 2) for i in range(5)]
-            cmap = plt.get_cmap("tab10")
-            for pathIdx,modelNameloadModelPath in enumerate(modelNameloadModelPaths):
+    numLayers = 5
+    plts = [plt.subplots(1, 2) for i in range(numLayers)] 
+    cmap = plt.get_cmap("tab10")
+    for ii, data in enumerate(datas):
+        for sim in data.sims:
+            for trial in sim.trials: 
+                modelNameloadModelPath = modelNameloadModelPaths[ii]
                 simObj = Simulation(trial.config, **trial.config)
                 simObj.createSimMembers(trial.config["members"], trial.config["modifiers"], trial.config["stages"], cachedSimMembers={})
                 model = simObj.members[modelName]
@@ -474,17 +562,21 @@ def getConvLayerGradientMetric(
                             gradH = torch.nn.functional.conv2d(channelData, sobelKernelH, bias=None, stride=1, padding=0, dilation=1, groups=1)
 
                             ssum = (gradV.pow(2) + gradH.pow(2)).pow(0.5)
+                            ssum = ssum[torch.where(ssum != 0)] # grab nonnegative gradient values
                             channelValues = torch.cat([channelValues, ssum], dim=0) # flattens all features to single dimmension
 
                         Means[lIdx][dIdx] = channelValues.mean().item()
-                        Stds[lIdx][dIdx] = channelValues.std().item()
+                        # Stds[lIdx][dIdx] = channelValues.std().item()
+                        Stds[lIdx][dIdx] = channelValues.std().item() / Means[lIdx][dIdx]
 
                 for i in range(len(Means)): # i is layer index
                     Means[i] = np.array(Means[i])
                     Stds[i] = np.array(Stds[i])
 
-                    plts[i][1][0].plot(Means[i], color=cmap(pathIdx))
-                    plts[i][1][1].plot(Stds[i], color=cmap(pathIdx))
+                    plts[i][1][0].plot(xs, Means[i], color=cmap(ii))
+                    plts[i][1][0].set_title("Means")
+                    plts[i][1][1].plot(xs, Stds[i], color=cmap(ii))
+                    plts[i][1][1].set_title("Normalized Stds")
 
                     # fig= plt.figure()
                     # plt.plot(xs, Means[i], color="tab:orange")
@@ -499,4 +591,184 @@ def getConvLayerGradientMetric(
                     plts[i][1][1].set_xticks(xs, prettyXTicks, rotation = 90)
                 plts[i][1][1].legend(linePrettyNames, loc='center left', bbox_to_anchor=(1, 0.5))
                 plts[i][0].tight_layout()
-                trial.addFigure(plts[i][0], "/features/gradientMetric/%s/layer%d/gradientMEtricOverDataset.png" % (str(datasetNames), i))
+                data.addFigure(plts[i][0], "/features/gradientMetric/%s/layer%d/gradientMEtricOverDataset.png" % (str(datasetNames), i))
+
+def getConvLayerMagnitude(
+    data
+    , modelName="model"
+    , modelNameloadModelPaths=["/stateDict/modelStateDict0.pth"]
+    , linePrettyNames = ["Post training"]
+    , datasetNames=["task1ValidData", "task1ValidData-Blur-1", "task1ValidData-Blur-2", "task1ValidData-Blur-3"]
+    , datsetValues=[0, 1, 2, 3]
+    , prettyXTicks=True
+    ):
+
+
+    for sim in data.sims:
+        for trial in sim.trials: 
+            plts = [plt.subplots(1, 3) for i in range(5)]
+            cmap = plt.get_cmap("tab10")
+            for pathIdx,modelNameloadModelPath in enumerate(modelNameloadModelPaths):
+                simObj = Simulation(trial.config, **trial.config)
+                simObj.createSimMembers(trial.config["members"], trial.config["modifiers"], trial.config["stages"], cachedSimMembers={})
+                model = simObj.members[modelName]
+                modelNameloadModelPathFull = trial.path + modelNameloadModelPath
+
+                model.load_state_dict(torch.load(modelNameloadModelPathFull, map_location=devices.comp))
+                datasets = [simObj.members[d] for d in datasetNames]
+                datasets = [getAllDataFromDataset(d) for d in datasets]
+
+                xs = []
+                Means = None
+                Stds = None
+                NumZeros = None
+                prettyXTicks = []
+                for dIdx, dataset in enumerate(datasets):
+                    prettyXTicks.append("%s %s" % (datasetNames[dIdx], str(datsetValues[dIdx])))
+                    allActivations, allLabels, markers  = getActivationsForDatasets(model, [dataset], datasetSymbols=None, flatten=False)
+                    if Means is None and Stds is None:
+                        # Means = [[0.0] * len(datasetNames)] * len(allActivations) # every layer has its own mean and std
+                        # Stds = [[0.0] * len(datasetNames)] * len(allActivations) # every layer has its own mean and std
+                        Means = [[0.0] * len(datasetNames) for ii in range(len(allActivations))] # every layer has its own mean and std
+                        Stds = [[0.0] * len(datasetNames) for ii in range(len(allActivations))] # every layer has its own mean and std
+                        NumZeros = [[0.0] * len(datasetNames) for ii in range(len(allActivations))] # every layer has its own mean and std
+                    xs.append(datsetValues[dIdx])
+                    for lIdx,layerActivations in enumerate(allActivations):
+                        if len(layerActivations.shape) <= 2: # if feed forward then skip
+                            continue
+                        channels = layerActivations.size()[1]
+                        # sobelV = torch.tensor([[1, 2, 1], [0, 0, 0], [-1, -2, -1]], dtype=torch.float32) / 4.0
+                        # sobelKernelV = sobelV.unsqueeze(0).expand(1, 1, 3, 3)
+                        # sobelH = sobelV.clone().T
+                        # sobelKernelH = sobelH.unsqueeze(0).expand(1, 1, 3, 3)
+                        channelValues = torch.tensor([])
+                        for c in range(channels):
+                            try:
+                                channelData = layerActivations[:, c, :, :].unsqueeze(1)
+                            except:
+                                code.interact(local=dict(globals(), **locals()))
+                            # gradV = torch.nn.functional.conv2d(channelData, sobelKernelV, bias=None, stride=1, padding=0, dilation=1, groups=1)
+                            # gradH = torch.nn.functional.conv2d(channelData, sobelKernelH, bias=None, stride=1, padding=0, dilation=1, groups=1)
+
+                            # ssum = (gradV.pow(2) + gradH.pow(2)).pow(0.5)
+                            # channelValues = torch.cat([channelValues, ssum], dim=0) 
+                            channelValues = torch.cat([channelValues, channelData], dim=0) 
+
+                        Means[lIdx][dIdx] = channelValues.mean().item()
+                        Stds[lIdx][dIdx] = channelValues.std().item()
+                        totalActivations = np.prod([ss for ss in channelValues.shape])
+                        NumZeros[lIdx][dIdx] = torch.sum(torch.where(channelValues == 0.0, torch.tensor(1.0),torch.tensor(0.0)) ).item() / float(totalActivations)
+
+                for i in range(len(Means)): # i is layer index
+                    Means[i] = np.array(Means[i])
+                    Stds[i] = np.array(Stds[i])
+
+                    plts[i][1][0].plot(xs, Means[i], color=cmap(pathIdx))
+                    plts[i][1][0].set_title("Means")
+                    plts[i][1][1].plot(xs, Stds[i], color=cmap(pathIdx))
+                    plts[i][1][1].set_title("Stds")
+                    plts[i][1][2].plot(xs, NumZeros[i], color=cmap(pathIdx))
+                    plts[i][1][2].set_title("Numer of Zeros")
+
+                    # fig= plt.figure()
+                    # plt.plot(xs, Means[i], color="tab:orange")
+                    # plt.fill_between(xs, Means[i]+Stds[i], Means[i]-Stds[i], color="tab:orange", alpha=0.4)
+                    # if prettyXTicks:
+                        # plt.xticks(xs, prettyXTicks, rotation = 90)
+                    # plt.tight_layout()
+                    # trial.addFigure(fig, "/features/gradientMetric/%s/layer%d/gradientMEtricOverDataset.png" % (str(datasetNames), i))
+            for i in  range(len(plts)):
+                if prettyXTicks:
+                    plts[i][1][0].set_xticks(xs, prettyXTicks, rotation = 90)
+                    plts[i][1][1].set_xticks(xs, prettyXTicks, rotation = 90)
+                    plts[i][1][2].set_xticks(xs, prettyXTicks, rotation = 90)
+                plts[i][1][2].legend(linePrettyNames, loc='center left', bbox_to_anchor=(1, 0.5))
+                plts[i][0].tight_layout()
+                trial.addFigure(plts[i][0], "/features/gradientMetric/%s/layer%d/magnitudeMetricOverDataset.png" % (str(datasetNames), i))
+
+def getConvLayerGradientDist(
+    data
+    , modelName="model"
+    , modelNameloadModelPaths=["/stateDict/modelStateDict0.pth"]
+    , linePrettyNames = ["Post training"]
+    , datasetNames=["task1ValidData", "task1ValidData-Blur-1", "task1ValidData-Blur-2", "task1ValidData-Blur-3"]
+    , datsetValues=[0, 1, 2, 3]
+    , prettyXTicks=True
+    ):
+
+
+    for sim in data.sims:
+        for trial in sim.trials: 
+            plts = [plt.subplots(1, 2) for i in range(5)]
+            cmap = plt.get_cmap("tab10")
+            for pathIdx,modelNameloadModelPath in enumerate(modelNameloadModelPaths):
+                simObj = Simulation(trial.config, **trial.config)
+                simObj.createSimMembers(trial.config["members"], trial.config["modifiers"], trial.config["stages"], cachedSimMembers={})
+                model = simObj.members[modelName]
+                modelNameloadModelPathFull = trial.path + modelNameloadModelPath
+
+                model.load_state_dict(torch.load(modelNameloadModelPathFull, map_location=devices.comp))
+                datasets = [simObj.members[d] for d in datasetNames]
+                datasets = [getAllDataFromDataset(d) for d in datasets]
+
+                xs = []
+                gradVals = None
+                Stds = None
+                prettyXTicks = []
+                for dIdx, dataset in enumerate(datasets):
+                    prettyXTicks.append("%s %s" % (datasetNames[dIdx], str(datsetValues[dIdx])))
+                    allActivations, allLabels, markers  = getActivationsForDatasets(model, [dataset], datasetSymbols=None, flatten=False)
+                    if gradVals is None and Stds is None:
+                        # gradVals = [[0.0] * len(datasetNames)] * len(allActivations) # every layer has its own mean and std
+                        # Stds = [[0.0] * len(datasetNames)] * len(allActivations) # every layer has its own mean and std
+                        gradVals = [[0.0] * len(datasetNames) for ii in range(len(allActivations))] # every layer has its own mean and std
+                        Stds = [[0.0] * len(datasetNames) for ii in range(len(allActivations))] # every layer has its own mean and std
+                    xs.append(datsetValues[dIdx])
+                    for lIdx,layerActivations in enumerate(allActivations):
+                        if len(layerActivations.shape) <= 2: # if feed forward then skip
+                            continue
+                        channels = layerActivations.size()[1]
+                        sobelV = torch.tensor([[1, 2, 1], [0, 0, 0], [-1, -2, -1]], dtype=torch.float32) / 4.0
+                        sobelKernelV = sobelV.unsqueeze(0).expand(1, 1, 3, 3)
+                        sobelH = sobelV.clone().T
+                        sobelKernelH = sobelH.unsqueeze(0).expand(1, 1, 3, 3)
+                        channelValues = torch.tensor([])
+                        for c in range(channels):
+                            try:
+                                channelData = layerActivations[:, c, :, :].unsqueeze(1)
+                            except:
+                                code.interact(local=dict(globals(), **locals()))
+                            gradV = torch.nn.functional.conv2d(channelData, sobelKernelV, bias=None, stride=1, padding=0, dilation=1, groups=1)
+                            gradH = torch.nn.functional.conv2d(channelData, sobelKernelH, bias=None, stride=1, padding=0, dilation=1, groups=1)
+
+                            ssum = (gradV.pow(2) + gradH.pow(2)).pow(0.5)
+                            # ssum = ssum[torch.where(ssum != 0)] # grab nonnegative gradient values
+                            channelValues = torch.cat([channelValues, ssum], dim=0) # flattens all features to single dimmension
+
+                        gradVals[lIdx][dIdx] = channelValues.ravel().detach().numpy()
+                        # Stds[lIdx][dIdx] = channelValues.std().item()
+
+                for i in range(len(gradVals)): # i is layer index
+                    gradVals[i] = np.array(gradVals[i])
+                    # Stds[i] = np.array(Stds[i])
+
+                    plts[i][1][0].hist(gradVals[i], alpha=0.5)
+                    # plts[i][1][0].plot(xs, gradVals[i], color=cmap(pathIdx))
+                    plts[i][1][0].set_title("gradVals")
+                    # plts[i][1][1].plot(xs, Stds[i], color=cmap(pathIdx))
+                    # plts[i][1][1].set_title("Stds")
+
+                    # fig= plt.figure()
+                    # plt.plot(xs, gradVals[i], color="tab:orange")
+                    # plt.fill_between(xs, gradVals[i]+Stds[i], gradVals[i]-Stds[i], color="tab:orange", alpha=0.4)
+                    # if prettyXTicks:
+                        # plt.xticks(xs, prettyXTicks, rotation = 90)
+                    # plt.tight_layout()
+                    # trial.addFigure(fig, "/features/gradientMetric/%s/layer%d/gradientMEtricOverDataset.png" % (str(datasetNames), i))
+            for i in  range(len(plts)):
+                # if prettyXTicks:
+                    # plts[i][1][0].set_xticks(xs, prettyXTicks, rotation = 90)
+                    # plts[i][1][1].set_xticks(xs, prettyXTicks, rotation = 90)
+                plts[i][1][0].legend(linePrettyNames, loc='center left', bbox_to_anchor=(1, 0.5))
+                plts[i][0].tight_layout()
+                trial.addFigure(plts[i][0], "/features/gradientMetric/%s/layer%d/gradientHistOverDataset.png" % (str(datasetNames), i))
