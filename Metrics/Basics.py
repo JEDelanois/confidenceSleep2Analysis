@@ -5,6 +5,7 @@ import copy
 import code
 from tabulate import tabulate
 import Utils.ConfigUtil
+import matplotlib.colors as mcolors
 
 
 
@@ -182,10 +183,56 @@ def plotTrialMetricOverDatasetValue(data, datsetNames=["task1TrainData"], datset
                 plt.xlabel(prettyXLabel)
             plt.tight_layout()
 
+# # x-axis - datset name gets mapped to dataset value and plotted 
+# # y-axis - metric value 
+# # every line corresponds the data set at a specific time point
+# def plotSpecificTrialMetricOverDatasetValue(datas, datsetNames=["task1TrainData"], datsetValues=[0], timePoints=[0], metricName="confidence", timePointsPrettyNames=None, prettyXTicks=True, prettyFileName=None, prettyXLabel=None, lineStyles=["-"], lineColors=["tab:blue"]):
+    # # code.interact(local=dict(globals(), **locals()))
+    # assert len(datas) == len(timePoints)
+
+
+    # leg = []
+    # fig = plt.figure()
+    # if prettyFileName is not None:
+        # for data in datas:
+            # data.addFigure(fig, prettyFileName)
+    # else:
+        # for data in datas:
+            # # data.addFigure(fig, "%s-%s-specificMetricOverDatasetValue.pdf" % (str(datsetNames), str(metricName)))
+            # data.addFigure(fig, "%s-%s-specificMetricOverDatasetValue.png" % (str(datsetNames), str(metricName)))
+    # for t,(data, timePoint) in enumerate(zip(datas,timePoints)):
+        # for sim in data.sims:
+            # for trial in sim.trials:
+
+
+                # # for t,timePoint in enumerate(timePoints):
+                # xs = []
+                # ys = []
+                # prettyXTicks = []
+                # for i, datasetName in enumerate(datsetNames):
+                    # prettyXTicks.append("%s %s" % (datasetName, str(datsetValues[i])))
+                    # xs.append(datsetValues[i])
+                    # metricValue = trial.data.datasetMetrics[datasetName][metricName][timePoint,1]
+                    # ys.append(metricValue)
+
+                # plt.plot(xs,ys, lineStyles[t], c=lineColors[t] )
+                # if timePointsPrettyNames ==  None:
+                    # leg.append("TimePoint %s" % (str(timePoint)))
+                # else:
+                    # leg.append("TimePoint %s" % (timePointsPrettyNames[t]))
+
+        # plt.legend(leg, loc='center left', bbox_to_anchor=(1, 0.5))
+        # if prettyXTicks:
+            # plt.xticks(xs, prettyXTicks, rotation = 90)
+        # plt.ylabel(metricName)
+        # if prettyXLabel is not None:
+            # plt.xlabel(prettyXLabel)
+        # plt.tight_layout()
+
 # x-axis - datset name gets mapped to dataset value and plotted 
 # y-axis - metric value 
 # every line corresponds the data set at a specific time point
-def plotSpecificTrialMetricOverDatasetValue(datas, datsetNames=["task1TrainData"], datsetValues=[0], timePoints=[0], metricName="confidence", timePointsPrettyNames=None, prettyXTicks=True, prettyFileName=None, prettyXLabel=None, lineStyles=["-"], lineColors=["tab:blue"]):
+def plotSpecificTrialMetricOverDatasetValue(datas, datsetNames=["task1TrainData"], datsetValues=[0], timePoints=[0], metricName="confidence", timePointsPrettyNames=None, prettyXTicks=True, prettyFileName=None, prettyXLabel=None, lineStyles=["-"], lineColors=["tab:blue"], alpha=0.3):
     # code.interact(local=dict(globals(), **locals()))
     assert len(datas) == len(timePoints)
 
@@ -199,7 +246,11 @@ def plotSpecificTrialMetricOverDatasetValue(datas, datsetNames=["task1TrainData"
         for data in datas:
             # data.addFigure(fig, "%s-%s-specificMetricOverDatasetValue.pdf" % (str(datsetNames), str(metricName)))
             data.addFigure(fig, "%s-%s-specificMetricOverDatasetValue.png" % (str(datsetNames), str(metricName)))
+    if lineColors is None:
+        lineColors = [k for k in mcolors.TABLEAU_COLORS.keys()]
     for t,(data, timePoint) in enumerate(zip(datas,timePoints)):
+        allXs = []
+        allYs = []
         for sim in data.sims:
             for trial in sim.trials:
 
@@ -213,20 +264,28 @@ def plotSpecificTrialMetricOverDatasetValue(datas, datsetNames=["task1TrainData"
                     xs.append(datsetValues[i])
                     metricValue = trial.data.datasetMetrics[datasetName][metricName][timePoint,1]
                     ys.append(metricValue)
+                allXs.append(xs)
+                allYs.append(ys)
+            meanXs = allXs[0] # all x values for datasets should be the same
+            allYs = np.array(allYs)
+            meanYs = allYs.mean(axis=0)
+            stdsYs = allYs.std(axis=0)
 
-                plt.plot(xs,ys, lineStyles[t], c=lineColors[t] )
-                if timePointsPrettyNames ==  None:
-                    leg.append("TimePoint %s" % (str(timePoint)))
-                else:
-                    leg.append("TimePoint %s" % (timePointsPrettyNames[t]))
+            label = None
+            if timePointsPrettyNames ==  None:
+                label = "TimePoint %s" % (str(timePoint))
+            else:
+                label = "TimePoint %s" % (timePointsPrettyNames[t])
+            plt.plot(meanXs,meanYs, lineStyles[t], c=lineColors[t], label=label)
+            plt.fill_between(meanXs, meanYs+stdsYs, meanYs-stdsYs, color=lineColors[t], alpha=alpha)
 
-        plt.legend(leg, loc='center left', bbox_to_anchor=(1, 0.5))
-        if prettyXTicks:
-            plt.xticks(xs, prettyXTicks, rotation = 90)
-        plt.ylabel(metricName)
-        if prettyXLabel is not None:
-            plt.xlabel(prettyXLabel)
-        plt.tight_layout()
+    plt.legend()
+    if prettyXTicks:
+        plt.xticks(xs, prettyXTicks, rotation = 90)
+    plt.ylabel(metricName)
+    if prettyXLabel is not None:
+        plt.xlabel(prettyXLabel)
+    plt.tight_layout()
 
 # x-axis - dataset name
 # y-axis - certain time point for certain data object
