@@ -43,7 +43,7 @@ baselineGradExp.createSimulationStructureFromPattern( \
     "../simulationSweep-BaselineGradExpansion/" \
     , "Mnist baselineGradExp" \
     ,[] \
-    , range(0,1)) 
+    , range(0,3)) 
 datas.append(baselineGradExp)
 
 for data in datas:

@@ -244,8 +244,8 @@ def plotSpecificTrialMetricOverDatasetValue(datas, datsetNames=["task1TrainData"
             data.addFigure(fig, prettyFileName)
     else:
         for data in datas:
-            # data.addFigure(fig, "%s-%s-specificMetricOverDatasetValue.pdf" % (str(datsetNames), str(metricName)))
             data.addFigure(fig, "%s-%s-specificMetricOverDatasetValue.png" % (str(datsetNames), str(metricName)))
+            data.addFigure(fig, "%s-%s-specificMetricOverDatasetValue.pdf" % (str(datsetNames), str(metricName)))
     if lineColors is None:
         lineColors = [k for k in mcolors.TABLEAU_COLORS.keys()]
     for t,(data, timePoint) in enumerate(zip(datas,timePoints)):
