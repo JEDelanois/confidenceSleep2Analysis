@@ -109,7 +109,7 @@ for i,datasetNames in enumerate(dataGroups):
     for metricName, metricFile in zip(metricNames, metricFiles):
         for data in datas:
             Metrics.LoadData.loadMetric(data, metricName=metricName, metricFile=metricFile, forceDatasetLoadFolders=datasetNames, detectMemberDataFolders=False)
-        Metrics.Basics.plotSpecificTrialMetricOverDatasetValue(datas, datsetNames=datasetNames, datsetValues=valueGroup, timePoints=[-1,-1, -1], metricName=metricName, timePointsPrettyNames=["Baseline", "Baseline + Sleep", "Baseline + Grad Exp"], prettyXTicks=True, prettyFileName=None, prettyXLabel=None, lineStyles=["-", "-", "-"], lineColors=["tab:blue", "tab:orange", "tab:green"], alpha=0.2)
+        Metrics.Basics.plotSpecificTrialMetricOverDatasetValue(datas, datsetNames=datasetNames, datsetValues=valueGroup, timePoints=[-1,-1, -1], metricName=metricName, timePointsPrettyNames=["Baseline", "Baseline + Sleep", "Baseline + Grad Exp"],usePrettyXTicks=True, prettyFileName=None, prettyXLabel=None, lineStyles=["-", "-", "-"], lineColors=["tab:blue", "tab:orange", "tab:green"], alpha=0.2)
 
 
 # SleepAnalysis.SleepBasics.loadSleepData(data)

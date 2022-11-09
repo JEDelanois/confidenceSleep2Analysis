@@ -232,7 +232,7 @@ def plotTrialMetricOverDatasetValue(data, datsetNames=["task1TrainData"], datset
 # x-axis - datset name gets mapped to dataset value and plotted 
 # y-axis - metric value 
 # every line corresponds the data set at a specific time point
-def plotSpecificTrialMetricOverDatasetValue(datas, datsetNames=["task1TrainData"], datsetValues=[0], timePoints=[0], metricName="confidence", timePointsPrettyNames=None, prettyXTicks=True, prettyFileName=None, prettyXLabel=None, lineStyles=["-"], lineColors=["tab:blue"], alpha=0.3):
+def plotSpecificTrialMetricOverDatasetValue(datas, datsetNames=["task1TrainData"], datsetValues=[0], timePoints=[0], metricName="confidence", timePointsPrettyNames=None, usePrettyXTicks=True, prettyFileName=None, prettyXLabel=None, lineStyles=["-"], lineColors=["tab:blue"], alpha=0.3):
     # code.interact(local=dict(globals(), **locals()))
     assert len(datas) == len(timePoints)
 
@@ -279,12 +279,14 @@ def plotSpecificTrialMetricOverDatasetValue(datas, datsetNames=["task1TrainData"
             plt.plot(meanXs,meanYs, lineStyles[t], c=lineColors[t], label=label)
             plt.fill_between(meanXs, meanYs+stdsYs, meanYs-stdsYs, color=lineColors[t], alpha=alpha)
 
-    plt.legend()
-    if prettyXTicks:
+    # plt.legend()
+    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    if usePrettyXTicks:
         plt.xticks(xs, prettyXTicks, rotation = 90)
     plt.ylabel(metricName)
     if prettyXLabel is not None:
         plt.xlabel(prettyXLabel)
+    # plt.gca().set_ylim(top=1.0)
     plt.tight_layout()
 
 # x-axis - dataset name
