@@ -411,6 +411,92 @@ def plotMetricTable(datas, modelNames=[], datsetNames=["task1TrainData"], timePo
         with open(filePath, "w") as f:
             f.write(s)
 
+
+def plotMultiMetricTable(
+    data
+    , datasetForm="testTask1AllData-Blur-%s-SP-%s"
+
+    , dataset0Vals=[1, 3, 6]
+    , dataset1Vals=[0.1, 0.3, 0.6]
+
+    ,dataset0_0Fallback="testTask1AllData-SP-%s"
+    ,dataset1_0Fallback="testTask1AllData-Blur-%s"
+    ,both_0Fallback="testTask1AllData"
+
+    , data0Label="Blur Intensity"
+    , data1Label="SP Intensity"
+
+    , timePoint=0
+    , metricName="matlabAcc"
+    , timePointsPrettyName=None
+    , prettyFileName=None
+    ):
+
+    def prettyNum(num):
+        return str(num).replace(".", "_")
+
+
+
+    for sim in data.sims:
+        fig = plt.figure()
+
+        if prettyFileName is not None:
+            sim.addFigure(fig, "%s-%s-MultiMetricImshow.png" % (prettyFileName, str(metricName)))
+        else:
+            sim.addFigure(fig, "%s-%s-MultiMetricImshow.png" % (datasetForm, metricName))
+
+        plt.title("%s\non\n%s" % (sim.title, datasetForm))
+
+        table = []
+        for i in range(len(dataset0Vals)):
+            table.append([])
+            for j in range(len(dataset1Vals)):
+                table[i].append(None) # now can use table[i][j]
+                trialVals = []
+                for trial in sim.trials:
+
+                    # get correct dataset name base on falbacks
+                    datasetName = None
+                    if dataset0Vals[i] == 0 and dataset1Vals[j] == 0:
+                        datasetName = both_0Fallback
+                    elif dataset0Vals[i] == 0:
+                        datasetName = dataset0_0Fallback % prettyNum(dataset1Vals[j])
+                    elif dataset1Vals[j] == 0:
+                        datasetName = dataset1_0Fallback % prettyNum(dataset0Vals[i])
+                    else:
+                        datasetName = datasetForm % (prettyNum(dataset0Vals[i]), prettyNum(dataset1Vals[j])) 
+
+                    # error checking
+                    if datasetName is None:
+                        print("invalid dataset name")
+                        print(datasetName)
+                        exit()
+
+                    metricValue = trial.data.datasetMetrics[datasetName][metricName][timePoint,1]
+                    trialVals.append(metricValue)
+                table[i][j] = np.mean(trialVals)
+
+
+        table = np.array(table)
+        vmin = None
+        vmax = None
+        plt.imshow(table, interpolation='none', cmap="Reds", aspect="auto", vmin=vmin, vmax=vmax)
+        plt.colorbar()
+        plt.xlabel(data1Label)
+        plt.ylabel(data0Label)
+        ax = plt.gca()
+        for (j,i),label in np.ndenumerate(table):
+            label = "%.4f" % label
+            ax.text(i,j,label,ha='center',va='center', size="small")
+            ax.text(i,j,label,ha='center',va='center', size="small")
+
+        ax.set_xticks(np.arange(len(dataset1Vals)))
+        ax.set_yticks(np.arange(len(dataset0Vals)))
+        ax.set_xticklabels(dataset1Vals)
+        ax.set_yticklabels(dataset0Vals)
+        plt.tight_layout()
+    
+
     
 
 
