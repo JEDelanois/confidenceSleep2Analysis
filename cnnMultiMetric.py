@@ -34,40 +34,40 @@ def createMultiMetricGroup(datasetForm="testTask1AllData-Blur-%s-SP-%s", dataset
 data = SimData(figureFolderPath="../figures/" )
 
 data.createSimulationStructureFromPattern( \
-    "../simulations/testBaseline/" \
+    "../simulationSweep-Baseline/" \
     , "Baseline" \
     ,[] \
-    , range(0,1)) 
+    , range(0,3)) 
 
 data.createSimulationStructureFromPattern( \
-    "../simulations/testBaselineGradExpansion/" \
+    "../simulationSweep-BaselineGradExpansion/" \
     , "Grad Expansion" \
     ,[] \
-    , range(0,1)) 
+    , range(0,3)) 
 
 data.createSimulationStructureFromPattern( \
-    "../simulations/testBaselineSleep/" \
+    "../simulationSweep-BaselineSleep/" \
     , "SRC" \
     ,[] \
-    , range(0,1)) 
+    , range(0,3)) 
 
 data.createSimulationStructureFromPattern( \
-    "../simulations/testBaselineFineTuneBlur/" \
+    "../simulationSweep-BaselineFinetuneBlur/" \
     , "Baseline + FT Blur" \
     ,[] \
-    , range(0,1)) 
+    , range(0,3)) 
 
 data.createSimulationStructureFromPattern( \
-    "../simulations/testBaselineFineTuneGN/" \
+    "../simulationSweep-BaselineFinetuneGN/" \
     , "Baseline + FT GN" \
     ,[] \
-    , range(0,1)) 
+    , range(0,3)) 
 
 data.createSimulationStructureFromPattern( \
-    "../simulations/testBaselineFineTuneSP/" \
+    "../simulationSweep-BaselineFinetuneSP/" \
     , "Baseline + FT SP" \
     ,[] \
-    , range(0,1)) 
+    , range(0,3)) 
 
 Utils.ConfigUtil.loadConfigsForSimulations(data)
 
@@ -165,6 +165,9 @@ Metrics.Basics.plotMultiMetricTable(
     , metricName="matlabAcc"
     , timePointsPrettyName=None
     , prettyFileName=None
+
+    ,vmin=0.0
+    ,vmax=1.0
     )
 
 Metrics.Basics.plotMultiMetricTable(
@@ -186,6 +189,9 @@ Metrics.Basics.plotMultiMetricTable(
     , metricName="matlabAcc"
     , timePointsPrettyName=None
     , prettyFileName=None
+
+    ,vmin=0.0
+    ,vmax=1.0
     )
 
 # SleepAnalysis.SleepBasics.loadSleepData(data)

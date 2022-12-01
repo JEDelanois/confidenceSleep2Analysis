@@ -430,6 +430,9 @@ def plotMultiMetricTable(
     , metricName="matlabAcc"
     , timePointsPrettyName=None
     , prettyFileName=None
+
+    ,vmin=None
+    ,vmax=None
     ):
 
     def prettyNum(num):
@@ -478,8 +481,6 @@ def plotMultiMetricTable(
 
 
         table = np.array(table)
-        vmin = None
-        vmax = None
         plt.imshow(table, interpolation='none', cmap="Reds", aspect="auto", vmin=vmin, vmax=vmax)
         plt.colorbar()
         plt.xlabel(data1Label)
