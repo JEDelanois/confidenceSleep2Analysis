@@ -15,6 +15,9 @@ from sklearn.decomposition import KernelPCA
 from sklearn.cluster import KMeans
 from sklearn import metrics
 import copy
+from skimage.transform import resize
+import torchvision.transforms as T
+
 
 def getAllDataFromDataset(
     dataset
@@ -772,3 +775,301 @@ def getConvLayerGradientDist(
                 plts[i][1][0].legend(linePrettyNames, loc='center left', bbox_to_anchor=(1, 0.5))
                 plts[i][0].tight_layout()
                 trial.addFigure(plts[i][0], "/features/gradientMetric/%s/layer%d/gradientHistOverDataset.png" % (str(datasetNames), i))
+
+# gradcam implementation from this paper
+# https://arxiv.org/pdf/1610.02391.pdf
+# http://gradcam.cloudcv.org/
+def getGradcam( # saves gradcam for all models and images in individual folders
+    datas
+    , modelName="model"
+    , modelNameloadModelPaths=["/stateDict/modelStateDict0.pth"]
+    , modelPrettyNames = ["Post training"]
+    , datasetNames=["task1ValidData", "task1ValidData-Blur-1", "task1ValidData-Blur-2", "task1ValidData-Blur-3"]
+    , datsetValues=[0, 1, 2, 3]
+    , imgIndexes=[0, 1]
+    , seed=0
+    ):
+
+    for d, data in enumerate(datas):
+        for s, sim in enumerate(data.sims):
+            for t, trial in enumerate(sim.trials):
+                simObj = Simulation(trial.config, **trial.config)
+                simObj.createSimMembers(trial.config["members"], trial.config["modifiers"], trial.config["stages"], cachedSimMembers={})
+                model = simObj.members[modelName]
+                modelNameloadModelPathFull = trial.path + modelNameloadModelPaths[s]
+
+                model.load_state_dict(torch.load(modelNameloadModelPathFull, map_location=devices.comp))
+                datasets = [simObj.members[d] for d in datasetNames]
+
+                hookHandles = []
+                activations = None
+                def forwardHook(layer, input, output):
+                    output.retain_grad()
+                    activations.append(output)
+
+                for layer in model.children():
+                    if hasattr(layer, 'weight'):
+                        handle = layer.register_forward_hook(forwardHook)
+                        hookHandles.append(handle)
+                # add hooks
+
+                
+
+                for dd, dataset in enumerate(datasets):
+                    for imgIdx in imgIndexes:
+                        # seed every image for consistency 
+                        torch.manual_seed(seed)
+                        np.random.seed(seed) 
+
+
+                        activations = [] # reset activations for every image
+                        img, label = dataset[imgIdx]
+                        classLabel = torch.argmax(label)
+
+                        output = model(img.unsqueeze(0))
+                        output[0,classLabel].backward() # compute gradients with respect to labeled class
+
+                        lastConvActivation = -1
+                        for xx, act in enumerate(activations): # activations should be in order so grab the last convolutional one
+                            if len(act.shape) > 3:
+                                lastConvActivation = act
+
+                        grad = lastConvActivation.grad.clone().detach()[0,:] # [batch, filter, height, width]
+                        scaledActivation = lastConvActivation.clone().detach()[0,:]
+
+                        alpha = torch.mean(grad, dim=[1,2])
+                        for xx in range(alpha.shape[0]):
+                            scaledActivation[xx, :, :] *= alpha[xx]
+                        scaledActivation = torch.sum(scaledActivation, dim=0) # sum across channels
+                        relu = nn.ReLU()
+                        scaledActivation = relu(scaledActivation) # sum across channels
+                        # resizedScaledActivation = resize(scaledActivation,(img.shape[1],img.shape[2]),preserve_range=True)
+                        transform = T.Resize(size = (img.shape[1],img.shape[2]))
+                        # code.interact(local=dict(globals(), **locals()))
+                        resizedScaledActivation = transform(scaledActivation.unsqueeze(0))[0,:]
+
+
+                        fig, axs = plt.subplots(1, 3)
+                        plotImg = img[0,:]
+                        axs[0].imshow(plotImg) 
+                        axs[1].imshow(scaledActivation, cmap="jet") 
+
+                        axs[2].imshow(plotImg,alpha=0.5) 
+                        axs[2].imshow(resizedScaledActivation,alpha=0.5, cmap="jet") 
+
+                        plt.suptitle(modelPrettyNames[s])
+
+                        plt.tight_layout()
+                        # data.addFigure(fig, "gradcam/%s/%d.png" % (datasetNames[dd], imgIdx))
+                        trial.addFigure(fig, "gradcam/%s/%d.png" % (datasetNames[dd], imgIdx))
+                        
+
+                for handle in hookHandles:
+                    handle.remove()
+
+def getMultiGradcam( # allows you to easily compare gradcam for two models
+    datas
+    , modelName="model"
+    , modelNameloadModelPaths=["/stateDict/modelStateDict0.pth"]
+    , modelPrettyNames = ["Post training"]
+    , datasetNames=["task1ValidData", "task1ValidData-Blur-1", "task1ValidData-Blur-2", "task1ValidData-Blur-3"]
+    , datsetValues=[0, 1, 2, 3]
+    , imgIndexes=[0, 1]
+    , seed=0
+    ):
+
+    allFigures = [plt.subplots(len(datas), 3) for i in range(len(datasetNames) * len(imgIndexes))] # every image and dataset pair gets its own plot that holds models * 3 supblots
+    for i in range(len(allFigures)):
+        fig, axs = allFigures[i]
+        allFigures[i] = fig, axs.ravel()
+
+    for dd, dataset in enumerate(datasetNames):
+        for ii, imgIdx in enumerate(imgIndexes):
+            fig, axs = allFigures[(dd * len(datasetNames)) + ii]
+            datas[0].addFigure(fig, "gradcam/%s/%d.png" % (datasetNames[dd], imgIdx)) # only add figures to first data to prevent duplicates
+
+    for d, data in enumerate(datas):
+        # for s, sim in enumerate(data.sims):
+        s, sim = 0 , data.sims[0]
+        # for t, trial in enumerate(sim.trials):
+        t, trial = 0, sim.trials[0]
+        simObj = Simulation(trial.config, **trial.config)
+        simObj.createSimMembers(trial.config["members"], trial.config["modifiers"], trial.config["stages"], cachedSimMembers={})
+        model = simObj.members[modelName]
+        modelNameloadModelPathFull = trial.path + modelNameloadModelPaths[d]
+
+        model.load_state_dict(torch.load(modelNameloadModelPathFull, map_location=devices.comp))
+        datasets = [simObj.members[d] for d in datasetNames]
+
+        hookHandles = []
+        activations = None
+        def forwardHook(layer, input, output):
+            output.retain_grad()
+            activations.append(output)
+
+        for layer in model.children():
+            if hasattr(layer, 'weight'):
+                handle = layer.register_forward_hook(forwardHook)
+                hookHandles.append(handle)
+        # add hooks
+
+        
+
+        for dd, dataset in enumerate(datasets):
+            for ii, imgIdx in enumerate(imgIndexes):
+                # seed every image for consistency 
+                torch.manual_seed(seed)
+                np.random.seed(seed) 
+
+
+                activations = [] # reset activations for every image
+                img, label = dataset[imgIdx]
+                classLabel = torch.argmax(label)
+
+                output = model(img.unsqueeze(0))
+                output[0,classLabel].backward() # compute gradients with respect to labeled class
+                classPrediction = torch.argmax(output[0,:])
+
+                lastConvActivation = -1
+                for xx, act in enumerate(activations): # activations should be in order so grab the last convolutional one
+                    if len(act.shape) > 3:
+                        lastConvActivation = act
+
+                grad = lastConvActivation.grad.clone().detach()[0,:] # [batch, filter, height, width]
+                scaledActivation = lastConvActivation.clone().detach()[0,:]
+
+                alpha = torch.mean(grad, dim=[1,2])
+                for xx in range(alpha.shape[0]):
+                    scaledActivation[xx, :, :] *= alpha[xx]
+                scaledActivation = torch.sum(scaledActivation, dim=0) # sum across channels
+
+                relu = nn.ReLU()
+                scaledActivation = relu(scaledActivation) 
+
+                # resizedScaledActivation = resize(scaledActivation,(img.shape[1],img.shape[2]),preserve_range=True)
+                transform = T.Resize(size = (img.shape[1],img.shape[2]))
+                # code.interact(local=dict(globals(), **locals()))
+                resizedScaledActivation = transform(scaledActivation.unsqueeze(0))[0,:]
+
+
+                # fig, axs = plt.subplots(1, 3)
+                # code.interact(local=dict(globals(), **locals()))
+                fig, axs = allFigures[(dd * len(datasets)) + ii]
+                plotImg = img[0,:]
+
+                title = "%s\nImage Label %d\nModel Pred %d" % (modelPrettyNames[d], classLabel, classPrediction)
+
+                axs[(d*3)+0].imshow(plotImg) 
+                axs[(d*3)+0].set_title(title)
+                axs[(d*3)+1].imshow(scaledActivation, cmap="jet") 
+                axs[(d*3)+1].set_title(title)
+
+                axs[(d*3)+2].imshow(plotImg,alpha=0.5) 
+                axs[(d*3)+2].imshow(resizedScaledActivation,alpha=0.5, cmap="jet") 
+                axs[(d*3)+2].set_title(title)
+
+                # plt.suptitle(modelPrettyNames[s])
+
+                # data.addFigure(fig, "gradcam/%s/%d.png" % (datasetNames[dd], imgIdx))
+                # trial.addFigure(fig, "gradcam/%s/%d.png" % (datasetNames[dd], imgIdx))
+        for handle in hookHandles:
+            handle.remove()
+
+
+    for i in range(len(allFigures)):
+        fig, axs = allFigures[i]
+        fig.tight_layout()
+
+
+
+# def getMultiGradcam(
+    # datas
+    # , modelName="model"
+    # , modelNameloadModelPaths=["/stateDict/modelStateDict0.pth"]
+    # , modelPrettyNames = ["Post training"]
+    # , datasetNames=["task1ValidData", "task1ValidData-Blur-1", "task1ValidData-Blur-2", "task1ValidData-Blur-3"]
+    # , datsetValues=[0, 1, 2, 3]
+    # , imgIndexes=[0, 1]
+    # , seed=0
+    # ):
+
+    # for ii, imgIdx in enumerate(imgIndexes):
+        # fig, axs = plt.subplots(len(datasetNames) * len(imgIndexes), 3)
+        # for d, data in enumerate(datas):
+            # for s, sim in enumerate(data.sims):
+                # # for t, trial in enumerate(sim.trials):
+                # # can change the way trials are handled
+                # t = 0 
+                # trial = sim.trials[0]
+
+                # simObj = Simulation(trial.config, **trial.config)
+                # simObj.createSimMembers(trial.config["members"], trial.config["modifiers"], trial.config["stages"], cachedSimMembers={})
+                # model = simObj.members[modelName]
+                # modelNameloadModelPathFull = trial.path + modelNameloadModelPaths[s]
+
+                # model.load_state_dict(torch.load(modelNameloadModelPathFull, map_location=devices.comp))
+                # datasets = [simObj.members[d] for d in datasetNames]
+                # for dd, dataset in enumerate(datasets):
+                    # hookHandles = []
+                    # activations = None
+                    # def forwardHook(layer, input, output):
+                        # output.retain_grad()
+                        # activations.append(output)
+
+                    # for layer in model.children():
+                        # if hasattr(layer, 'weight'):
+                            # handle = layer.register_forward_hook(forwardHook)
+                            # hookHandles.append(handle)
+
+            # # for dd, dataset in enumerate(datasets):
+                # # for imgIdx in imgIndexes:
+                    # # seed every image for consistency 
+                    # torch.manual_seed(seed)
+                    # np.random.seed(seed) 
+
+
+                    # activations = [] # reset activations for every image
+                    # img, label = dataset[imgIdx]
+                    # classLabel = torch.argmax(label)
+
+                    # output = model(img.unsqueeze(0))
+                    # output[0,classLabel].backward() # compute gradients with respect to labeled class
+
+                    # lastConvActivation = -1
+                    # for xx, act in enumerate(activations): # activations should be in order so grab the last convolutional one
+                        # if len(act.shape) > 3:
+                            # lastConvActivation = act
+
+                    # grad = lastConvActivation.grad.clone().detach()[0,:] # [batch, filter, height, width]
+                    # scaledActivation = lastConvActivation.clone().detach()[0,:]
+
+                    # alpha = torch.mean(grad, dim=[1,2])
+                    # for xx in range(alpha.shape[0]):
+                        # scaledActivation[xx, :, :] *= alpha[xx]
+                    # scaledActivation = torch.sum(scaledActivation, dim=0) # sum across channels
+                    # relu = nn.ReLU()
+                    # scaledActivation = relu(scaledActivation) # sum across channels
+                    # # resizedScaledActivation = resize(scaledActivation,(img.shape[1],img.shape[2]),preserve_range=True)
+                    # transform = T.Resize(size = (img.shape[1],img.shape[2]))
+                    # # code.interact(local=dict(globals(), **locals()))
+                    # resizedScaledActivation = transform(scaledActivation.unsqueeze(0))[0,:]
+
+
+                    # fig, axs = plt.subplots(1, 3)
+                    # plotImg = img[0,:]
+                    # axs[(ii*3)+0].imshow(plotImg) 
+                    # axs[(ii*3)+0].set_title(modelPrettyNames[s])
+                    # axs[(ii*3)+1].imshow(scaledActivation, cmap="jet") 
+                    # axs[(ii*3)+1].set_title(modelPrettyNames[s])
+
+                    # axs[(ii*3)+2].imshow(plotImg,alpha=0.5) 
+                    # axs[(ii*3)+2].imshow(resizedScaledActivation,alpha=0.5, cmap="jet") 
+                    # axs[(ii*3)+2].set_title(modelPrettyNames[s])
+
+                    # plt.tight_layout()
+                    # data.addFigure(fig, "gradcam/%s/%d.png" % (datasetNames[dd], imgIdx))
+                    # # trial.addFigure(fig, "gradcam/%s/%d.png" % (datasetNames[dd], imgIdx))
+                    
+
+            # for handle in hookHandles:
+                # handle.remove()
