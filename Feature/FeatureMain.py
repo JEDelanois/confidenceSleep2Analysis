@@ -885,7 +885,7 @@ def getMultiGradcam( # allows you to easily compare gradcam for two models
 
     for dd, dataset in enumerate(datasetNames):
         for ii, imgIdx in enumerate(imgIndexes):
-            fig, axs = allFigures[(dd * len(datasetNames)) + ii]
+            fig, axs = allFigures[(ii * len(datasetNames)) + dd]
             datas[0].addFigure(fig, "gradcam/%s/%d.png" % (datasetNames[dd], imgIdx)) # only add figures to first data to prevent duplicates
 
     for d, data in enumerate(datas):
@@ -948,14 +948,13 @@ def getMultiGradcam( # allows you to easily compare gradcam for two models
 
                 # resizedScaledActivation = resize(scaledActivation,(img.shape[1],img.shape[2]),preserve_range=True)
                 transform = T.Resize(size = (img.shape[1],img.shape[2]))
-                # code.interact(local=dict(globals(), **locals()))
                 resizedScaledActivation = transform(scaledActivation.unsqueeze(0))[0,:]
 
 
                 # fig, axs = plt.subplots(1, 3)
                 # code.interact(local=dict(globals(), **locals()))
-                fig, axs = allFigures[(dd * len(datasets)) + ii]
-                plotImg = img[0,:]
+                fig, axs = allFigures[(ii * len(datasets)) + dd]
+                plotImg = img.permute(1, 2, 0) if img.shape[0] == 3 else img[0,:]
 
                 title = "%s\nImage Label %d\nModel Pred %d" % (modelPrettyNames[d], classLabel, classPrediction)
 
