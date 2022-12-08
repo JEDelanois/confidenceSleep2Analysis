@@ -956,16 +956,22 @@ def getMultiGradcam( # allows you to easily compare gradcam for two models
                 fig, axs = allFigures[(ii * len(datasets)) + dd]
                 plotImg = img.permute(1, 2, 0) if img.shape[0] == 3 else img[0,:]
 
-                title = "%s\nImage Label %d\nModel Pred %d" % (modelPrettyNames[d], classLabel, classPrediction)
+                title = "Image Label %d\nModel Pred %d" % (classLabel, classPrediction)
+                midTitle = "%s\nImage Label %d\nModel Pred %d" % (modelPrettyNames[d], classLabel, classPrediction)
 
                 axs[(d*3)+0].imshow(plotImg) 
                 axs[(d*3)+0].set_title(title)
                 axs[(d*3)+1].imshow(scaledActivation, cmap="jet") 
-                axs[(d*3)+1].set_title(title)
+                axs[(d*3)+1].set_title(midTitle)
 
                 axs[(d*3)+2].imshow(plotImg,alpha=0.5) 
                 axs[(d*3)+2].imshow(resizedScaledActivation,alpha=0.5, cmap="jet") 
                 axs[(d*3)+2].set_title(title)
+
+                # remove axis
+                for vv in range(3):
+                    axs[(d*3)+vv].get_xaxis().set_visible(False)
+                    axs[(d*3)+vv].get_yaxis().set_visible(False)
 
                 # plt.suptitle(modelPrettyNames[s])
 
