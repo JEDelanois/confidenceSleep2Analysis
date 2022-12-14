@@ -21,21 +21,24 @@ from simData import *
 
 
 allDatas = []
+modelNameloadModelPaths = []
 baselineData = SimData(figureFolderPath="../figures/" )
 baselineData.createSimulationStructureFromPattern( \
-    "/bazhlab/edelanois/cnnSleep/80/simulations/baseline/" \
+    "/bazhlab/adahuja/code/95/simulationSweep-Baseline/" \
     , "Baseline" \
     ,[] \
-    , range(0,10)) 
+    , range(0,1)) 
 allDatas.append(baselineData)
+modelNameloadModelPaths.append("/stateDict/modelStateDict0.pth")
 
 sleepData = SimData(figureFolderPath="../figures/" )
 sleepData.createSimulationStructureFromPattern( \
-    "/bazhlab/edelanois/cnnSleep/80/simulations/baselineSleep/" \
+    "/bazhlab/adahuja/code/95/simulationSweep-BaselineSleep/" \
     , "SRC" \
     ,[] \
-    , range(0,10)) 
+    , range(0,1)) 
 allDatas.append(sleepData)
+modelNameloadModelPaths.append("/stateDict/modelStateDict0.pth")
 
 for d in allDatas:
     Utils.ConfigUtil.loadConfigsForSimulations(d)
@@ -71,10 +74,11 @@ for dataGroup,valueGroup in zip(dataGroups, valueGroups):
     Feature.FeatureMain.getMultiGradcam(
     allDatas
     , modelName="model"
-    , modelNameloadModelPaths=["/stateDict/modelStateDict50.pth", "/stateDict/modelStateDict1.pth"]
+    , modelNameloadModelPaths=modelNameloadModelPaths
     , modelPrettyNames = ["Baseline", "SRC"]
     , datasetNames=dataGroup
     , datsetValues=valueGroup
+    # , imgIndexes=[0,1,2]
     , imgIndexes=[i for i in range(25)]
     )
     allDatas[0].saveFigures()
