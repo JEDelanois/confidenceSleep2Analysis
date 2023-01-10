@@ -21,6 +21,9 @@ from simData import *
 
 
 allDatas = []
+modelNameloadModelPaths=[]
+modelPrettyNames = []
+
 baselineData = SimData(figureFolderPath="../figures/" )
 baselineData.createSimulationStructureFromPattern( \
     "/bazhlab/edelanois/cnnSleep/80/simulations/baseline/" \
@@ -28,6 +31,8 @@ baselineData.createSimulationStructureFromPattern( \
     ,[] \
     , range(0,10)) 
 allDatas.append(baselineData)
+modelNameloadModelPaths.append("/stateDict/modelStateDict50.pth")
+modelPrettyNames.append("Baseline")
 
 sleepData = SimData(figureFolderPath="../figures/" )
 sleepData.createSimulationStructureFromPattern( \
@@ -36,6 +41,18 @@ sleepData.createSimulationStructureFromPattern( \
     ,[] \
     , range(0,10)) 
 allDatas.append(sleepData)
+modelNameloadModelPaths.append("/stateDict/modelStateDict1.pth")
+modelPrettyNames.append("SRC")
+
+sleepData = SimData(figureFolderPath="../figures/" )
+sleepData.createSimulationStructureFromPattern( \
+    "/bazhlab/edelanois/cnnSleep/81/simulationSweep/Sp/dataPercentage-1.0/" \
+    , "Finetune SP" \
+    ,[] \
+    , range(0,10)) 
+allDatas.append(sleepData)
+modelNameloadModelPaths.append("/stateDict/modelStateDict10.pth")
+modelPrettyNames.append("Finetune SP")
 
 for d in allDatas:
     Utils.ConfigUtil.loadConfigsForSimulations(d)
@@ -71,8 +88,8 @@ for dataGroup,valueGroup in zip(dataGroups, valueGroups):
     Feature.FeatureMain.getMultiGradcam(
     allDatas
     , modelName="model"
-    , modelNameloadModelPaths=["/stateDict/modelStateDict50.pth", "/stateDict/modelStateDict1.pth"]
-    , modelPrettyNames = ["Baseline", "SRC"]
+    , modelNameloadModelPaths=modelNameloadModelPaths
+    , modelPrettyNames = modelPrettyNames
     , datasetNames=dataGroup
     , datsetValues=valueGroup
     , imgIndexes=[i for i in range(25)]

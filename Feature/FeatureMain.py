@@ -876,7 +876,10 @@ def getMultiGradcam( # allows you to easily compare gradcam for two models
     , datsetValues=[0, 1, 2, 3]
     , imgIndexes=[0, 1]
     , seed=0
+    , useDevice="cuda:0"
     ):
+
+    device = torch.device(useDevice)
 
     allFigures = [plt.subplots(len(datas), 3) for i in range(len(datasetNames) * len(imgIndexes))] # every image and dataset pair gets its own plot that holds models * 3 supblots
     for i in range(len(allFigures)):
@@ -898,7 +901,7 @@ def getMultiGradcam( # allows you to easily compare gradcam for two models
         model = simObj.members[modelName]
         modelNameloadModelPathFull = trial.path + modelNameloadModelPaths[d]
 
-        model.load_state_dict(torch.load(modelNameloadModelPathFull, map_location=devices.comp))
+        model.load_state_dict(torch.load(modelNameloadModelPathFull, map_location=device))
         datasets = [simObj.members[d] for d in datasetNames]
 
         hookHandles = []
@@ -930,7 +933,7 @@ def getMultiGradcam( # allows you to easily compare gradcam for two models
                 output[0,classLabel].backward() # compute gradients with respect to labeled class
                 classPrediction = torch.argmax(output[0,:])
 
-                lastConvActivation = -1
+                lastConvActivation = None 
                 for xx, act in enumerate(activations): # activations should be in order so grab the last convolutional one
                     if len(act.shape) > 3:
                         lastConvActivation = act
@@ -956,13 +959,14 @@ def getMultiGradcam( # allows you to easily compare gradcam for two models
                 fig, axs = allFigures[(ii * len(datasets)) + dd]
                 plotImg = img.permute(1, 2, 0) if img.shape[0] == 3 else img[0,:]
 
-                title = "Image Label %d\nModel Pred %d" % (classLabel, classPrediction)
-                midTitle = "%s\nImage Label %d\nModel Pred %d" % (modelPrettyNames[d], classLabel, classPrediction)
+                # title = "Image Label %d\nModel Pred %d" % (classLabel, classPrediction)
+                # midTitle = "%s\nImage Label %d\nModel Pred %d" % (modelPrettyNames[d], classLabel, classPrediction)
+                title = "%s | L %d - P %d" % (modelPrettyNames[d], classLabel, classPrediction)
 
                 axs[(d*3)+0].imshow(plotImg) 
                 axs[(d*3)+0].set_title(title)
                 axs[(d*3)+1].imshow(scaledActivation, cmap="jet") 
-                axs[(d*3)+1].set_title(midTitle)
+                axs[(d*3)+1].set_title(title)
 
                 axs[(d*3)+2].imshow(plotImg,alpha=0.5) 
                 axs[(d*3)+2].imshow(resizedScaledActivation,alpha=0.5, cmap="jet") 
