@@ -19,7 +19,7 @@ import Feature.FeatureMain
 
 from simData import *
 
-figureFolderPath = "../figures/"
+figureFolderPath = "../figuresOverlap/"
 
 allDatas = []
 modelNameloadModelPaths=[]
@@ -27,7 +27,7 @@ modelPrettyNames = []
 
 baselineData = SimData(figureFolderPath=figureFolderPath )
 baselineData.createSimulationStructureFromPattern( \
-    "/bazhlab/adahuja/code/95/simulationSweep-Baseline/" \
+    "/bazhlab/edelanois/cnnSleep/80/simulations/baseline/" \
     , "Baseline" \
     ,[] \
     , range(0,1)) 
@@ -37,7 +37,7 @@ modelPrettyNames.append("Baseline")
 
 sleepData = SimData(figureFolderPath=figureFolderPath )
 sleepData.createSimulationStructureFromPattern( \
-    "/bazhlab/adahuja/code/95/simulationSweep-BaselineSleep/" \
+    "/bazhlab/edelanois/cnnSleep/80/simulations/baselineSleep/" \
     , "SRC" \
     ,[] \
     , range(0,1)) 
@@ -96,7 +96,6 @@ for dataGroup,valueGroup in zip(dataGroups, valueGroups):
     , modelPrettyNames = modelPrettyNames
     , datasetNames=dataGroup
     , datsetValues=valueGroup
-    # , imgIndexes=[0,1,2]
     , imgIndexes=[i for i in range(25)]
     )
     allDatas[0].saveFigures()
