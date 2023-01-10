@@ -21,26 +21,35 @@ from simData import *
 
 
 allDatas = []
+<<<<<<< HEAD
 modelNameloadModelPaths=[]
 modelPrettyNames = []
 
+=======
+modelNameloadModelPaths = []
+>>>>>>> e84fe5bef9882a069d8463e9190586c1e8039062
 baselineData = SimData(figureFolderPath="../figures/" )
 baselineData.createSimulationStructureFromPattern( \
-    "/bazhlab/edelanois/cnnSleep/80/simulations/baseline/" \
+    "/bazhlab/adahuja/code/95/simulationSweep-Baseline/" \
     , "Baseline" \
     ,[] \
-    , range(0,10)) 
+    , range(0,1)) 
 allDatas.append(baselineData)
+<<<<<<< HEAD
 modelNameloadModelPaths.append("/stateDict/modelStateDict50.pth")
 modelPrettyNames.append("Baseline")
+=======
+modelNameloadModelPaths.append("/stateDict/modelStateDict0.pth")
+>>>>>>> e84fe5bef9882a069d8463e9190586c1e8039062
 
 sleepData = SimData(figureFolderPath="../figures/" )
 sleepData.createSimulationStructureFromPattern( \
-    "/bazhlab/edelanois/cnnSleep/80/simulations/baselineSleep/" \
+    "/bazhlab/adahuja/code/95/simulationSweep-BaselineSleep/" \
     , "SRC" \
     ,[] \
-    , range(0,10)) 
+    , range(0,1)) 
 allDatas.append(sleepData)
+<<<<<<< HEAD
 modelNameloadModelPaths.append("/stateDict/modelStateDict1.pth")
 modelPrettyNames.append("SRC")
 
@@ -53,6 +62,9 @@ sleepData.createSimulationStructureFromPattern( \
 allDatas.append(sleepData)
 modelNameloadModelPaths.append("/stateDict/modelStateDict10.pth")
 modelPrettyNames.append("Finetune SP")
+=======
+modelNameloadModelPaths.append("/stateDict/modelStateDict0.pth")
+>>>>>>> e84fe5bef9882a069d8463e9190586c1e8039062
 
 for d in allDatas:
     Utils.ConfigUtil.loadConfigsForSimulations(d)
@@ -89,9 +101,14 @@ for dataGroup,valueGroup in zip(dataGroups, valueGroups):
     allDatas
     , modelName="model"
     , modelNameloadModelPaths=modelNameloadModelPaths
+<<<<<<< HEAD
     , modelPrettyNames = modelPrettyNames
+=======
+    , modelPrettyNames = ["Baseline", "SRC"]
+>>>>>>> e84fe5bef9882a069d8463e9190586c1e8039062
     , datasetNames=dataGroup
     , datsetValues=valueGroup
+    # , imgIndexes=[0,1,2]
     , imgIndexes=[i for i in range(25)]
     )
     allDatas[0].saveFigures()
