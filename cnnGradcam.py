@@ -19,41 +19,33 @@ import Feature.FeatureMain
 
 from simData import *
 
+figureFolderPath = "../figures/"
 
 allDatas = []
-<<<<<<< HEAD
 modelNameloadModelPaths=[]
 modelPrettyNames = []
 
-=======
-modelNameloadModelPaths = []
->>>>>>> e84fe5bef9882a069d8463e9190586c1e8039062
-baselineData = SimData(figureFolderPath="../figures/" )
+baselineData = SimData(figureFolderPath=figureFolderPath )
 baselineData.createSimulationStructureFromPattern( \
     "/bazhlab/adahuja/code/95/simulationSweep-Baseline/" \
     , "Baseline" \
     ,[] \
     , range(0,1)) 
 allDatas.append(baselineData)
-<<<<<<< HEAD
 modelNameloadModelPaths.append("/stateDict/modelStateDict50.pth")
 modelPrettyNames.append("Baseline")
-=======
-modelNameloadModelPaths.append("/stateDict/modelStateDict0.pth")
->>>>>>> e84fe5bef9882a069d8463e9190586c1e8039062
 
-sleepData = SimData(figureFolderPath="../figures/" )
+sleepData = SimData(figureFolderPath=figureFolderPath )
 sleepData.createSimulationStructureFromPattern( \
     "/bazhlab/adahuja/code/95/simulationSweep-BaselineSleep/" \
     , "SRC" \
     ,[] \
     , range(0,1)) 
 allDatas.append(sleepData)
-<<<<<<< HEAD
 modelNameloadModelPaths.append("/stateDict/modelStateDict1.pth")
 modelPrettyNames.append("SRC")
 
-sleepData = SimData(figureFolderPath="../figures/" )
+sleepData = SimData(figureFolderPath=figureFolderPath )
 sleepData.createSimulationStructureFromPattern( \
     "/bazhlab/edelanois/cnnSleep/81/simulationSweep/Sp/dataPercentage-1.0/" \
     , "Finetune SP" \
@@ -62,9 +54,6 @@ sleepData.createSimulationStructureFromPattern( \
 allDatas.append(sleepData)
 modelNameloadModelPaths.append("/stateDict/modelStateDict10.pth")
 modelPrettyNames.append("Finetune SP")
-=======
-modelNameloadModelPaths.append("/stateDict/modelStateDict0.pth")
->>>>>>> e84fe5bef9882a069d8463e9190586c1e8039062
 
 for d in allDatas:
     Utils.ConfigUtil.loadConfigsForSimulations(d)
@@ -72,14 +61,17 @@ for d in allDatas:
 dataGroups = []
 valueGroups = []
 
-dataGroups.append(["task1ValidData", "task1ValidData-Blur-1", "task1ValidData-Blur-2", "task1ValidData-Blur-3", "task1ValidData-Blur-4", "task1ValidData-Blur-5", "task1ValidData-Blur-6"])
-valueGroups.append([0., 1., 2., 3., 4., 5., 6.])
+dataGroups.append(["task1ValidData"])
+valueGroups.append([0.])
 
-dataGroups.append(["task1ValidData", "task1ValidData-SP-0_1", "task1ValidData-SP-0_2", "task1ValidData-SP-0_3", "task1ValidData-SP-0_4", "task1ValidData-SP-0_5", "task1ValidData-SP-0_6"])
-valueGroups.append([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6])
+# dataGroups.append(["task1ValidData", "task1ValidData-Blur-1", "task1ValidData-Blur-2", "task1ValidData-Blur-3", "task1ValidData-Blur-4", "task1ValidData-Blur-5", "task1ValidData-Blur-6"])
+# valueGroups.append([0., 1., 2., 3., 4., 5., 6.])
 
-dataGroups.append(["task1ValidData", "task1ValidData-GN-0_1", "task1ValidData-GN-0_2", "task1ValidData-GN-0_3", "task1ValidData-GN-0_4", "task1ValidData-GN-0_5", "task1ValidData-GN-0_6"])
-valueGroups.append([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6])
+# dataGroups.append(["task1ValidData", "task1ValidData-SP-0_1", "task1ValidData-SP-0_2", "task1ValidData-SP-0_3", "task1ValidData-SP-0_4", "task1ValidData-SP-0_5", "task1ValidData-SP-0_6"])
+# valueGroups.append([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6])
+
+# dataGroups.append(["task1ValidData", "task1ValidData-GN-0_1", "task1ValidData-GN-0_2", "task1ValidData-GN-0_3", "task1ValidData-GN-0_4", "task1ValidData-GN-0_5", "task1ValidData-GN-0_6"])
+# valueGroups.append([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6])
 
 # dataGroups.append(["task1ValidData", "task1ValidData-SE-0_25", "task1ValidData-SE-0_50", "task1ValidData-SE-0_60", "task1ValidData-SE-0_75", "task1ValidData-SE-0_90", "task1ValidData-SE-1_0"])
 # valueGroups.append([0.0, 0.25, 0.50, 0.60, 0.75, 0.90, 1.0])
@@ -101,11 +93,7 @@ for dataGroup,valueGroup in zip(dataGroups, valueGroups):
     allDatas
     , modelName="model"
     , modelNameloadModelPaths=modelNameloadModelPaths
-<<<<<<< HEAD
     , modelPrettyNames = modelPrettyNames
-=======
-    , modelPrettyNames = ["Baseline", "SRC"]
->>>>>>> e84fe5bef9882a069d8463e9190586c1e8039062
     , datasetNames=dataGroup
     , datsetValues=valueGroup
     # , imgIndexes=[0,1,2]
