@@ -22,13 +22,22 @@ from simData import *
 
 datas = []
 
-baseline = SimData(figureFolderPath="../figures/" )
+timePointsPrettyNames = []
+lineColors = []
+timePoints = []
+lineStyles = []
+
+baseline = SimData(figureFolderPath="../newFigures/" )
 baseline.createSimulationStructureFromPattern( \
     "../simulationSweep-Baseline/" \
     , "Mnist Baseline" \
     ,[] \
     , range(0,3)) 
 datas.append(baseline)
+timePointsPrettyNames.append("Baseline")
+lineColors.append("tab:blue")
+timePoints.append(-1)
+lineStyles.append("-")
 
 baselineSleep = SimData(figureFolderPath="../figures/" )
 baselineSleep.createSimulationStructureFromPattern( \
@@ -37,6 +46,10 @@ baselineSleep.createSimulationStructureFromPattern( \
     ,[] \
     , range(0,3)) 
 datas.append(baselineSleep)
+timePointsPrettyNames.append("Baseline + Sleep")
+lineColors.append("tab:orange")
+timePoints.append(-1)
+lineStyles.append("-")
 
 baselineGradExp = SimData(figureFolderPath="../figures/" )
 baselineGradExp.createSimulationStructureFromPattern( \
@@ -45,6 +58,34 @@ baselineGradExp.createSimulationStructureFromPattern( \
     ,[] \
     , range(0,3)) 
 datas.append(baselineGradExp)
+timePointsPrettyNames.append("Baseline + Grad Exp")
+lineColors.append("tab:green")
+timePoints.append(-1)
+lineStyles.append("-")
+
+# finetuneBlur = SimData(figureFolderPath="../figures/" )
+# finetuneBlur.createSimulationStructureFromPattern( \
+    # "/bazhlab/edelanois/cnnSleep/81/simulationSweep/Blur/dataPercentage-1.0/" \
+    # , "Mnist finetuneBlur" \
+    # ,[] \
+    # , range(0,3)) 
+# datas.append(finetuneBlur)
+# timePointsPrettyNames.append("Baseline + FT Blur")
+# lineColors.append("tab:brown")
+# timePoints.append(-1)
+# lineStyles.append("--")
+
+# finetuneGn = SimData(figureFolderPath="../figures/" )
+# finetuneGn.createSimulationStructureFromPattern( \
+    # "/bazhlab/edelanois/cnnSleep/81/simulationSweep/Sp/dataPercentage-1.0/" \
+    # , "Mnist finetuneGn" \
+    # ,[] \
+    # , range(0,3)) 
+# datas.append(finetuneGn)
+# timePointsPrettyNames.append("Baseline + FT Sp")
+# lineColors.append("tab:purple")
+# timePoints.append(-1)
+# lineStyles.append("--")
 
 for data in datas:
     Utils.ConfigUtil.loadConfigsForSimulations(data)
@@ -52,6 +93,18 @@ for data in datas:
 dataGroups = []
 valueGroups = []
 
+# Validation sets
+# dataGroups.append(["task1ValidData", "task1ValidData-Blur-1", "task1ValidData-Blur-2", "task1ValidData-Blur-3", "task1ValidData-Blur-4", "task1ValidData-Blur-5", "task1ValidData-Blur-6",])
+# valueGroups.append([0., 1., 2., 3., 4., 5., 6.])
+
+# dataGroups.append(["task1ValidData", "task1ValidData-SP-0_1", "task1ValidData-SP-0_2", "task1ValidData-SP-0_3", "task1ValidData-SP-0_4", "task1ValidData-SP-0_5", "task1ValidData-SP-0_6",])
+# valueGroups.append([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6])
+
+# dataGroups.append(["task1ValidData", "task1ValidData-GN-0_1", "task1ValidData-GN-0_2", "task1ValidData-GN-0_3", "task1ValidData-GN-0_4", "task1ValidData-GN-0_5", "task1ValidData-GN-0_6",])
+# valueGroups.append([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6])
+
+
+# Test sets
 dataGroups.append(["testTask1AllData", "testTask1AllData-Blur-1", "testTask1AllData-Blur-2", "testTask1AllData-Blur-3", "testTask1AllData-Blur-4", "testTask1AllData-Blur-5", "testTask1AllData-Blur-6",])
 valueGroups.append([0., 1., 2., 3., 4., 5., 6.])
 
@@ -61,6 +114,10 @@ valueGroups.append([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6])
 dataGroups.append(["testTask1AllData", "testTask1AllData-GN-0_1", "testTask1AllData-GN-0_2", "testTask1AllData-GN-0_3", "testTask1AllData-GN-0_4", "testTask1AllData-GN-0_5", "testTask1AllData-GN-0_6",])
 valueGroups.append([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6])
 
+
+
+
+# # Extra sets
 # dataGroups.append(["testTask1AllData", "testTask1AllData-SE-0_25", "testTask1AllData-SE-0_50", "testTask1AllData-SE-0_60", "testTask1AllData-SE-0_75", "testTask1AllData-SE-0_90", "testTask1AllData-SE-1_0",])
 # valueGroups.append([0.0, 0.25, 0.50, 0.60, 0.75, 0.90, 1.0])
 
@@ -109,7 +166,7 @@ for i,datasetNames in enumerate(dataGroups):
     for metricName, metricFile in zip(metricNames, metricFiles):
         for data in datas:
             Metrics.LoadData.loadMetric(data, metricName=metricName, metricFile=metricFile, forceDatasetLoadFolders=datasetNames, detectMemberDataFolders=False)
-        Metrics.Basics.plotSpecificTrialMetricOverDatasetValue(datas, datsetNames=datasetNames, datsetValues=valueGroup, timePoints=[-1,-1, -1], metricName=metricName, timePointsPrettyNames=["Baseline", "Baseline + Sleep", "Baseline + Grad Exp"],usePrettyXTicks=True, prettyFileName=None, prettyXLabel=None, lineStyles=["-", "-", "-"], lineColors=["tab:blue", "tab:orange", "tab:green"], alpha=0.2)
+        Metrics.Basics.plotSpecificTrialMetricOverDatasetValue(datas, datsetNames=datasetNames, datsetValues=valueGroup, timePoints=timePoints, metricName=metricName, timePointsPrettyNames=timePointsPrettyNames ,usePrettyXTicks=True, prettyFileName=None, prettyXLabel=None, lineStyles=lineStyles, lineColors=lineColors, alpha=0.2)
 
 
 # SleepAnalysis.SleepBasics.loadSleepData(data)
