@@ -114,7 +114,7 @@ def combine_dims(a, start=1, count=2):
     s = a.shape
     return np.reshape(a, s[:start] + (-1,) + s[start+count:])
 
-def plotSleepStuff(data):
+def plotSleepStuff(data, plotFilters=False):
     for sim in data.sims:
         for trial in sim.trials: 
 
@@ -205,209 +205,210 @@ def plotSleepStuff(data):
                 plt.ylabel("Number of weights")
                 trial.addFigure(fig, "weightPostSleepHist-%s.png" % (layerName))
 
-            for layerName in trial.preWeights:
-                pre = trial.preWeights[layerName]
-                if len(pre.shape) > 2: # assume it is a conv filter
-                    fig, axs = plt.subplots(pre.shape[0], pre.shape[1])
+            if plotFilters:
+                for layerName in trial.preWeights:
+                    pre = trial.preWeights[layerName]
+                    if len(pre.shape) > 2: # assume it is a conv filter
+                        fig, axs = plt.subplots(pre.shape[0], pre.shape[1])
 
-                    # need to modify shapes to make generalizable when dimmension is 1
-                    if pre.shape[0] == 1:
-                        axs = np.expand_dims(axs, 0)
-                    if pre.shape[1] == 1:
-                        axs = np.expand_dims(axs, 1)
+                        # need to modify shapes to make generalizable when dimmension is 1
+                        if pre.shape[0] == 1:
+                            axs = np.expand_dims(axs, 0)
+                        if pre.shape[1] == 1:
+                            axs = np.expand_dims(axs, 1)
 
-                    minVal = pre.min()
-                    maxVal = pre.max()
-                    if minVal == 0.0 and maxVal == 0.0:
-                        minVal = -0.0001
-                        maxVal = 0.0001
-                    for i in range(pre.shape[0]):
-                        for j in range(pre.shape[1]):
-                            im = axs[i][j].imshow(pre[i,j,:,:], aspect='auto', interpolation='none', vmin=minVal, vmax=maxVal)
-                            # fig.colorbar(im, cax=axs[i][j])
-                            axs[i][j].axes.xaxis.set_visible(False)
-                            axs[i][j].axes.yaxis.set_visible(False)
-                            axs[i][j].axis('equal')
-                            axs[i][j].spines['top'].set_visible(False)
-                            axs[i][j].spines['right'].set_visible(False)
-                            axs[i][j].spines['bottom'].set_visible(False)
-                            axs[i][j].spines['left'].set_visible(False)
-                    fig.suptitle("Presleep weight visualizations %s" % layerName)
-                    fig.colorbar(im, ax=axs.ravel().tolist())
-                    # fig.tight_layout()
-                    trial.addFigure(fig, "weightVisualizations/preSleep-%s.png" % (layerName))
-                else:
-                    fig = plt.figure()
-                    plt.imshow(pre, aspect='auto', interpolation='none')
-                    plt.title("Presleep weight visualizations %s" % layerName)
-                    plt.colorbar()
-                    trial.addFigure(fig, "weightVisualizations/preSleep-%s.png" % (layerName))
+                        minVal = pre.min()
+                        maxVal = pre.max()
+                        if minVal == 0.0 and maxVal == 0.0:
+                            minVal = -0.0001
+                            maxVal = 0.0001
+                        for i in range(pre.shape[0]):
+                            for j in range(pre.shape[1]):
+                                im = axs[i][j].imshow(pre[i,j,:,:], aspect='auto', interpolation='none', vmin=minVal, vmax=maxVal)
+                                # fig.colorbar(im, cax=axs[i][j])
+                                axs[i][j].axes.xaxis.set_visible(False)
+                                axs[i][j].axes.yaxis.set_visible(False)
+                                axs[i][j].axis('equal')
+                                axs[i][j].spines['top'].set_visible(False)
+                                axs[i][j].spines['right'].set_visible(False)
+                                axs[i][j].spines['bottom'].set_visible(False)
+                                axs[i][j].spines['left'].set_visible(False)
+                        fig.suptitle("Presleep weight visualizations %s" % layerName)
+                        fig.colorbar(im, ax=axs.ravel().tolist())
+                        # fig.tight_layout()
+                        trial.addFigure(fig, "weightVisualizations/preSleep-%s.png" % (layerName))
+                    else:
+                        fig = plt.figure()
+                        plt.imshow(pre, aspect='auto', interpolation='none')
+                        plt.title("Presleep weight visualizations %s" % layerName)
+                        plt.colorbar()
+                        trial.addFigure(fig, "weightVisualizations/preSleep-%s.png" % (layerName))
 
-            for layerName in trial.preWeights:
-                pre = trial.preWeights[layerName]
-                post = trial.postWeights[layerName]
-                if len(pre.shape) > 2: # assume it is a conv filter
+                for layerName in trial.preWeights:
+                    pre = trial.preWeights[layerName]
+                    post = trial.postWeights[layerName]
+                    if len(pre.shape) > 2: # assume it is a conv filter
 
-                    # need to modify shapes to make generalizable when dimmension is 1
-                    if pre.shape[0] == 1:
-                        axs = np.expand_dims(axs, 0)
-                    if pre.shape[1] == 1:
-                        axs = np.expand_dims(axs, 1)
+                        # need to modify shapes to make generalizable when dimmension is 1
+                        if pre.shape[0] == 1:
+                            axs = np.expand_dims(axs, 0)
+                        if pre.shape[1] == 1:
+                            axs = np.expand_dims(axs, 1)
 
-                    minVal = min(pre.min(), post.min())
-                    maxVal = max(pre.max(), post.max())
-                    # make symetric around 0
-                    lim = max(abs(minVal), abs(maxVal))
-                    minVal = -lim
-                    maxVal = lim
-                    if minVal == 0.0 and maxVal == 0.0:
-                        minVal = -0.0001
-                        maxVal = 0.0001
-                    for i in range(pre.shape[0]):
-                        for j in range(pre.shape[1]):
-                            fig, axs = plt.subplots(1, 3)
-                            fig.suptitle("filter-%d-%d" % (i,j))
-                            try:
-                                # set plotwise min and max vals
-                                # if you want global min / max vals then 
-                                minVal = min(pre[i,j,:,:].min(), post[i,j,:,:].min())
-                                maxVal = min(pre[i,j,:,:].max(), post[i,j,:,:].max())
-                                lim = max(abs(minVal), abs(maxVal))
-                                minVal = -lim
-                                maxVal = lim
-                                if minVal == 0.0 and maxVal == 0.0:
-                                    minVal = -0.0001
-                                    maxVal = 0.0001
+                        minVal = min(pre.min(), post.min())
+                        maxVal = max(pre.max(), post.max())
+                        # make symetric around 0
+                        lim = max(abs(minVal), abs(maxVal))
+                        minVal = -lim
+                        maxVal = lim
+                        if minVal == 0.0 and maxVal == 0.0:
+                            minVal = -0.0001
+                            maxVal = 0.0001
+                        for i in range(pre.shape[0]):
+                            for j in range(pre.shape[1]):
+                                fig, axs = plt.subplots(1, 3)
+                                fig.suptitle("filter-%d-%d" % (i,j))
+                                try:
+                                    # set plotwise min and max vals
+                                    # if you want global min / max vals then 
+                                    minVal = min(pre[i,j,:,:].min(), post[i,j,:,:].min())
+                                    maxVal = min(pre[i,j,:,:].max(), post[i,j,:,:].max())
+                                    lim = max(abs(minVal), abs(maxVal))
+                                    minVal = -lim
+                                    maxVal = lim
+                                    if minVal == 0.0 and maxVal == 0.0:
+                                        minVal = -0.0001
+                                        maxVal = 0.0001
 
-                                im = axs[0].imshow(pre[i,j,:,:], aspect='auto', interpolation='none', vmin=minVal, vmax=maxVal, cmap="coolwarm")
-                                # im = axs[0].imshow(pre[i,j,:,:], aspect='auto', interpolation='none', norm=colors.CenteredNorm(), cmap="coolwarm")
-                                # im = axs[0].pcolormesh(pre[i,j,:,:], norm=colors.CenteredNorm(), cmap="coolwarm")
-                                divider = make_axes_locatable(axs[0])
-                                cax = divider.append_axes('right', size='5%', pad=0.05)
-                                fig.colorbar(im, cax=cax, orientation='vertical')
-                                axs[0].set_title("PreSleep Weights")
+                                    im = axs[0].imshow(pre[i,j,:,:], aspect='auto', interpolation='none', vmin=minVal, vmax=maxVal, cmap="coolwarm")
+                                    # im = axs[0].imshow(pre[i,j,:,:], aspect='auto', interpolation='none', norm=colors.CenteredNorm(), cmap="coolwarm")
+                                    # im = axs[0].pcolormesh(pre[i,j,:,:], norm=colors.CenteredNorm(), cmap="coolwarm")
+                                    divider = make_axes_locatable(axs[0])
+                                    cax = divider.append_axes('right', size='5%', pad=0.05)
+                                    fig.colorbar(im, cax=cax, orientation='vertical')
+                                    axs[0].set_title("PreSleep Weights")
 
-                                im = axs[1].imshow(post[i,j,:,:], aspect='auto', interpolation='none', vmin=minVal, vmax=maxVal, cmap="coolwarm")
-                                # im = axs[1].imshow(post[i,j,:,:], aspect='auto', interpolation='none', norm=colors.CenteredNorm(), cmap="coolwarm")
-                                divider = make_axes_locatable(axs[1])
-                                cax = divider.append_axes('right', size='5%', pad=0.05)
-                                fig.colorbar(im, cax=cax, orientation='vertical')
-                                axs[1].set_title("PostSleep Weights")
+                                    im = axs[1].imshow(post[i,j,:,:], aspect='auto', interpolation='none', vmin=minVal, vmax=maxVal, cmap="coolwarm")
+                                    # im = axs[1].imshow(post[i,j,:,:], aspect='auto', interpolation='none', norm=colors.CenteredNorm(), cmap="coolwarm")
+                                    divider = make_axes_locatable(axs[1])
+                                    cax = divider.append_axes('right', size='5%', pad=0.05)
+                                    fig.colorbar(im, cax=cax, orientation='vertical')
+                                    axs[1].set_title("PostSleep Weights")
                                 
-                                diff = post[i,j,:,:] - pre[i,j,:,:]
-                                lim = max(abs(diff.min()), abs(diff.max()))
-                                im = axs[2].imshow(diff, aspect='auto', interpolation='none', vmin=-lim, vmax=lim, cmap="coolwarm")
-                                # im = axs[2].imshow(diff, aspect='auto', interpolation='none', norm=colors.CenteredNorm(), cmap="coolwarm")
-                                divider = make_axes_locatable(axs[2])
-                                cax = divider.append_axes('right', size='5%', pad=0.05)
-                                fig.colorbar(im, cax=cax, orientation='vertical')
-                                axs[2].set_title("Difference")
-                            except Exception as e:
-                                print(e)
-                                code.interact(local=dict(globals(), **locals()))
+                                    diff = post[i,j,:,:] - pre[i,j,:,:]
+                                    lim = max(abs(diff.min()), abs(diff.max()))
+                                    im = axs[2].imshow(diff, aspect='auto', interpolation='none', vmin=-lim, vmax=lim, cmap="coolwarm")
+                                    # im = axs[2].imshow(diff, aspect='auto', interpolation='none', norm=colors.CenteredNorm(), cmap="coolwarm")
+                                    divider = make_axes_locatable(axs[2])
+                                    cax = divider.append_axes('right', size='5%', pad=0.05)
+                                    fig.colorbar(im, cax=cax, orientation='vertical')
+                                    axs[2].set_title("Difference")
+                                except Exception as e:
+                                    print(e)
+                                    code.interact(local=dict(globals(), **locals()))
 
-                            # fig.colorbar(im, cax=axs[i][j])
-                            for jj in range(3):
-                                axs[jj].axes.xaxis.set_visible(False)
-                                axs[jj].axes.yaxis.set_visible(False)
-                                axs[jj].axis('equal')
-                                axs[jj].spines['top'].set_visible(False)
-                                axs[jj].spines['right'].set_visible(False)
-                                axs[jj].spines['bottom'].set_visible(False)
-                                axs[jj].spines['left'].set_visible(False)
-                            trial.addFigure(fig, "weightVisualizations/layerWeights-%s_all/filter-%d-%d.png" % (layerName,i,j))
-                    # fig.tight_layout()
+                                # fig.colorbar(im, cax=axs[i][j])
+                                for jj in range(3):
+                                    axs[jj].axes.xaxis.set_visible(False)
+                                    axs[jj].axes.yaxis.set_visible(False)
+                                    axs[jj].axis('equal')
+                                    axs[jj].spines['top'].set_visible(False)
+                                    axs[jj].spines['right'].set_visible(False)
+                                    axs[jj].spines['bottom'].set_visible(False)
+                                    axs[jj].spines['left'].set_visible(False)
+                                trial.addFigure(fig, "weightVisualizations/layerWeights-%s_all/filter-%d-%d.png" % (layerName,i,j))
+                        # fig.tight_layout()
 
-            for layerName in trial.preWeights:
-                try:
-                    pre = trial.preWeights[layerName].ravel()
-                    post = trial.postWeights[layerName].ravel()
-                    diff = post - pre
-                    fig = plt.figure()
-                    plt.scatter(pre, diff)
-                    plt.xlabel("PreSleep weight magniture")
-                    plt.ylabel("Sleep Delta")
-                    plt.title(layerName)
-                    trial.addFigure(fig, "weightVisualizations/%s-differentialvsInitialWeight.png" % (layerName))
-                except Exception as e:
-                    print(e)
-                    code.interact(local=dict(globals(), **locals()))
+                for layerName in trial.preWeights:
+                    try:
+                        pre = trial.preWeights[layerName].ravel()
+                        post = trial.postWeights[layerName].ravel()
+                        diff = post - pre
+                        fig = plt.figure()
+                        plt.scatter(pre, diff)
+                        plt.xlabel("PreSleep weight magniture")
+                        plt.ylabel("Sleep Delta")
+                        plt.title(layerName)
+                        trial.addFigure(fig, "weightVisualizations/%s-differentialvsInitialWeight.png" % (layerName))
+                    except Exception as e:
+                        print(e)
+                        code.interact(local=dict(globals(), **locals()))
 
-            for layerName in trial.postWeights:
-                post = trial.postWeights[layerName]
-                if len(post.shape) > 2: # assume it is a conv filter
-                    fig, axs = plt.subplots(post.shape[0], post.shape[1])
+                for layerName in trial.postWeights:
+                    post = trial.postWeights[layerName]
+                    if len(post.shape) > 2: # assume it is a conv filter
+                        fig, axs = plt.subplots(post.shape[0], post.shape[1])
 
-                    # need to modify shapes to make generalizable when dimmension is 1
-                    if post.shape[0] == 1:
-                        axs = np.expand_dims(axs, 0)
-                    if post.shape[1] == 1:
-                        axs = np.expand_dims(axs, 1)
+                        # need to modify shapes to make generalizable when dimmension is 1
+                        if post.shape[0] == 1:
+                            axs = np.expand_dims(axs, 0)
+                        if post.shape[1] == 1:
+                            axs = np.expand_dims(axs, 1)
 
-                    minVal = post.min()
-                    maxVal = post.max()
-                    if minVal == 0.0 and maxVal == 0.0:
-                        minVal = -0.0001
-                        maxVal = 0.0001
-                    for i in range(post.shape[0]):
-                        for j in range(post.shape[1]):
-                            im = axs[i][j].imshow(post[i,j,:,:], aspect='auto', interpolation='none', vmin=minVal, vmax=maxVal)
-                            # fig.colorbar(im, cax=axs[i][j])
-                            axs[i][j].axes.xaxis.set_visible(False)
-                            axs[i][j].axes.yaxis.set_visible(False)
-                            axs[i][j].axis('equal')
-                            axs[i][j].spines['top'].set_visible(False)
-                            axs[i][j].spines['right'].set_visible(False)
-                            axs[i][j].spines['bottom'].set_visible(False)
-                            axs[i][j].spines['left'].set_visible(False)
-                    fig.suptitle("Postsleep weight visualizations %s" % layerName)
-                    fig.colorbar(im, ax=axs.ravel().tolist())
-                    trial.addFigure(fig, "weightVisualizations/postSleep-%s.png" % (layerName))
-                else:
-                    fig = plt.figure()
-                    plt.imshow(post, aspect='auto', interpolation='none')
-                    plt.title("Postsleep weight visualizations %s" % layerName)
-                    plt.colorbar()
-                    trial.addFigure(fig, "weightVisualizations/postSleep-%s.png" % (layerName))
+                        minVal = post.min()
+                        maxVal = post.max()
+                        if minVal == 0.0 and maxVal == 0.0:
+                            minVal = -0.0001
+                            maxVal = 0.0001
+                        for i in range(post.shape[0]):
+                            for j in range(post.shape[1]):
+                                im = axs[i][j].imshow(post[i,j,:,:], aspect='auto', interpolation='none', vmin=minVal, vmax=maxVal)
+                                # fig.colorbar(im, cax=axs[i][j])
+                                axs[i][j].axes.xaxis.set_visible(False)
+                                axs[i][j].axes.yaxis.set_visible(False)
+                                axs[i][j].axis('equal')
+                                axs[i][j].spines['top'].set_visible(False)
+                                axs[i][j].spines['right'].set_visible(False)
+                                axs[i][j].spines['bottom'].set_visible(False)
+                                axs[i][j].spines['left'].set_visible(False)
+                        fig.suptitle("Postsleep weight visualizations %s" % layerName)
+                        fig.colorbar(im, ax=axs.ravel().tolist())
+                        trial.addFigure(fig, "weightVisualizations/postSleep-%s.png" % (layerName))
+                    else:
+                        fig = plt.figure()
+                        plt.imshow(post, aspect='auto', interpolation='none')
+                        plt.title("Postsleep weight visualizations %s" % layerName)
+                        plt.colorbar()
+                        trial.addFigure(fig, "weightVisualizations/postSleep-%s.png" % (layerName))
 
-            for layerName in trial.postWeights:
-                pre = trial.preWeights[layerName]
-                post = trial.postWeights[layerName]
-                diff = post-pre
-                if len(diff.shape) > 2: # assume it is a conv filter
-                    fig, axs = plt.subplots(diff.shape[0], diff.shape[1])
+                for layerName in trial.postWeights:
+                    pre = trial.preWeights[layerName]
+                    post = trial.postWeights[layerName]
+                    diff = post-pre
+                    if len(diff.shape) > 2: # assume it is a conv filter
+                        fig, axs = plt.subplots(diff.shape[0], diff.shape[1])
 
-                    # need to modify shapes to make generalizable when dimmension is 1
-                    if diff.shape[0] == 1:
-                        axs = np.expand_dims(axs, 0)
-                    if diff.shape[1] == 1:
-                        axs = np.expand_dims(axs, 1)
+                        # need to modify shapes to make generalizable when dimmension is 1
+                        if diff.shape[0] == 1:
+                            axs = np.expand_dims(axs, 0)
+                        if diff.shape[1] == 1:
+                            axs = np.expand_dims(axs, 1)
 
-                    minVal = diff.min()
-                    maxVal = diff.max()
+                        minVal = diff.min()
+                        maxVal = diff.max()
 
-                    if minVal == 0 and maxVal == 0:
-                        minVal = -0.0001
-                        maxVal = 0.0001
+                        if minVal == 0 and maxVal == 0:
+                            minVal = -0.0001
+                            maxVal = 0.0001
 
-                    # code.interact(local=dict(globals(), **locals()))
-                    for i in range(diff.shape[0]):
-                        for j in range(diff.shape[1]):
-                            im = axs[i][j].imshow(diff[i,j,:,:], aspect='auto', interpolation='none', vmin=minVal, vmax=maxVal)
-                            # fig.colorbar(im, cax=axs[i][j])
-                            axs[i][j].axes.xaxis.set_visible(False)
-                            axs[i][j].axes.yaxis.set_visible(False)
-                            axs[i][j].axis('equal')
-                            axs[i][j].spines['top'].set_visible(False)
-                            axs[i][j].spines['right'].set_visible(False)
-                            axs[i][j].spines['bottom'].set_visible(False)
-                            axs[i][j].spines['left'].set_visible(False)
-                    fig.suptitle("Diff sleep weight visualizations %s" % layerName)
-                    fig.colorbar(im, ax=axs.ravel().tolist())
-                    trial.addFigure(fig, "weightVisualizations/diffSleep-%s.png" % (layerName))
-                else:
-                    fig = plt.figure()
-                    plt.imshow(diff, aspect='auto', interpolation='none')
-                    plt.title("diff sleep weight visualizations %s" % layerName)
-                    plt.colorbar()
-                    trial.addFigure(fig, "weightVisualizations/diffSleep-%s.png" % (layerName))
+                        # code.interact(local=dict(globals(), **locals()))
+                        for i in range(diff.shape[0]):
+                            for j in range(diff.shape[1]):
+                                im = axs[i][j].imshow(diff[i,j,:,:], aspect='auto', interpolation='none', vmin=minVal, vmax=maxVal)
+                                # fig.colorbar(im, cax=axs[i][j])
+                                axs[i][j].axes.xaxis.set_visible(False)
+                                axs[i][j].axes.yaxis.set_visible(False)
+                                axs[i][j].axis('equal')
+                                axs[i][j].spines['top'].set_visible(False)
+                                axs[i][j].spines['right'].set_visible(False)
+                                axs[i][j].spines['bottom'].set_visible(False)
+                                axs[i][j].spines['left'].set_visible(False)
+                        fig.suptitle("Diff sleep weight visualizations %s" % layerName)
+                        fig.colorbar(im, ax=axs.ravel().tolist())
+                        trial.addFigure(fig, "weightVisualizations/diffSleep-%s.png" % (layerName))
+                    else:
+                        fig = plt.figure()
+                        plt.imshow(diff, aspect='auto', interpolation='none')
+                        plt.title("diff sleep weight visualizations %s" % layerName)
+                        plt.colorbar()
+                        trial.addFigure(fig, "weightVisualizations/diffSleep-%s.png" % (layerName))
