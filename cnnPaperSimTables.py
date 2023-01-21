@@ -64,6 +64,30 @@ timePoints.append(-1)
 timePointsPrettyNames.append("Baseline + SRC + FFF")
 lineColors.append("tab:orange")
 
+baselineGradExp = SimData(figureFolderPath="../figures/" )
+baselineGradExp.createSimulationStructureFromPattern( \
+    "" \
+    , "Baseline + Grad Exp" \
+    ,[] \
+    , range(0,10))
+simDatas.append(baselineGradExp)
+datas.append(baselineGradExp)
+timePoints.append(-1)
+timePointsPrettyNames.append("Baseline + Grad Exp")
+lineColors.append("tab:green")
+
+baselineGradExpFff = SimData(figureFolderPath="../figures/" )
+baselineGradExpFff.createSimulationStructureFromPattern( \
+    "" \
+    , "Baseline + Grad Exp + FFF" \
+    ,[] \
+    , range(0,10))
+simDatas.append(baselineGradExpFff)
+datas.append(baselineGradExpFff)
+timePoints.append(-1)
+timePointsPrettyNames.append("Baseline + Grad Exp")
+lineColors.append("tab:green")
+
 # fineTuneAll = SimData(figureFolderPath="../figures/" )
 # fineTuneAll.createSimulationStructureFromPattern( \
     # "/bazhlab/edelanois/cnnSleep/89/simulationSweep-BaselineFinetune/All/dataPercentage-1.0/" \
