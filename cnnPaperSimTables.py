@@ -49,7 +49,8 @@ baselineSleep.createSimulationStructureFromPattern( \
 simDatas.append(baselineSleep)
 datas.append(baselineSleep)
 timePoints.append(-1)
-timePointsPrettyNames.append("Baseline + SRC")
+# timePointsPrettyNames.append("Baseline + SRC")
+timePointsPrettyNames.append("SRC")
 lineColors.append("tab:gray")
 
 baselineSleepFff = SimData(figureFolderPath="../figures/" )
@@ -61,31 +62,34 @@ baselineSleepFff.createSimulationStructureFromPattern( \
 simDatas.append(baselineSleepFff)
 datas.append(baselineSleepFff)
 timePoints.append(-1)
-timePointsPrettyNames.append("Baseline + SRC + FFF")
+# timePointsPrettyNames.append("Baseline + SRC + FFF")
+timePointsPrettyNames.append("SRC + FFF")
 lineColors.append("tab:orange")
 
 baselineGradExp = SimData(figureFolderPath="../figures/" )
 baselineGradExp.createSimulationStructureFromPattern( \
-    "" \
+    "/bazhlab/edelanois/cnnSleep/89/simulationSweep-BaselineGradExpansion" \
     , "Baseline + Grad Exp" \
     ,[] \
     , range(0,10))
 simDatas.append(baselineGradExp)
 datas.append(baselineGradExp)
 timePoints.append(-1)
-timePointsPrettyNames.append("Baseline + Grad Exp")
+# timePointsPrettyNames.append("Baseline + Grad Exp")
+timePointsPrettyNames.append("Grad Exp")
 lineColors.append("tab:green")
 
 baselineGradExpFff = SimData(figureFolderPath="../figures/" )
 baselineGradExpFff.createSimulationStructureFromPattern( \
-    "" \
+    "/bazhlab/edelanois/cnnSleep/89/simulationSweep-BaselineGradExpansionFf/" \
     , "Baseline + Grad Exp + FFF" \
     ,[] \
     , range(0,10))
 simDatas.append(baselineGradExpFff)
 datas.append(baselineGradExpFff)
 timePoints.append(-1)
-timePointsPrettyNames.append("Baseline + Grad Exp")
+# timePointsPrettyNames.append("Baseline + Grad Exp + FFF")
+timePointsPrettyNames.append("Grad Exp + FFF")
 lineColors.append("tab:green")
 
 # fineTuneAll = SimData(figureFolderPath="../figures/" )
@@ -97,7 +101,8 @@ lineColors.append("tab:green")
 # simDatas.append(fineTuneAll)
 # datas.append(fineTuneAll)
 # timePoints.append(-1)
-# timePointsPrettyNames.append("Baseline + FT All")
+# # timePointsPrettyNames.append("Baseline + FT All")
+# timePointsPrettyNames.append("FT All")
 # lineColors.append("tab:purple")
 
 fineTuneBlur = SimData(figureFolderPath="../figures/" )
@@ -109,7 +114,8 @@ fineTuneBlur.createSimulationStructureFromPattern( \
 simDatas.append(fineTuneBlur)
 datas.append(fineTuneBlur)
 timePoints.append(-1)
-timePointsPrettyNames.append("Baseline + FT Blur")
+# timePointsPrettyNames.append("Baseline + FT Blur")
+timePointsPrettyNames.append("FT Blur")
 lineColors.append("tab:brown")
 
 fineTuneGn = SimData(figureFolderPath="../figures/" )
@@ -121,7 +127,8 @@ fineTuneGn.createSimulationStructureFromPattern( \
 simDatas.append(fineTuneGn)
 datas.append(fineTuneGn)
 timePoints.append(-1)
-timePointsPrettyNames.append("Baseline + FT GN")
+# timePointsPrettyNames.append("Baseline + FT GN")
+timePointsPrettyNames.append("FT GN")
 lineColors.append("tab:purple")
 
 fineTuneSp = SimData(figureFolderPath="../figures/" )
@@ -133,7 +140,8 @@ fineTuneSp.createSimulationStructureFromPattern( \
 simDatas.append(fineTuneSp)
 datas.append(fineTuneSp)
 timePoints.append(-1)
-timePointsPrettyNames.append("Baseline + FT SP")
+# timePointsPrettyNames.append("Baseline + FT SP")
+timePointsPrettyNames.append("FT SP")
 lineColors.append("tab:pink")
 
 

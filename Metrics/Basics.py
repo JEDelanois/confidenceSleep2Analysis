@@ -372,9 +372,11 @@ def plotMetricTable(datas, modelNames=[], datsetNames=["task1TrainData"], timePo
     if prettyFileName is not None:
         for data in datas:
             data.addFigure(fig, "%s-%s-imshow.png" % (prettyFileName, str(metricName)))
+            data.addFigure(fig, "%s-%s-imshow.pdf" % (prettyFileName, str(metricName)))
     else:
         for data in datas:
             data.addFigure(fig, "modelNames%s-DatasetNames%s-%s-imshow.png" % (str(datsetNames), str(datsetNames), str(metricName)))
+            data.addFigure(fig, "modelNames%s-DatasetNames%s-%s-imshow.pdf" % (str(datsetNames), str(datsetNames), str(metricName)))
 
     yticks = []
     table = []
