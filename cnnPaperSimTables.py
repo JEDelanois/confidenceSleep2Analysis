@@ -23,6 +23,10 @@ from simData import *
 forceReload = True
 
 simDatas = []
+datas = []
+timePoints = []
+timePointsPrettyNames = []
+lineColors = []
 
 baseline = SimData(figureFolderPath="../icmlFigures/tables/" )
 baseline.createSimulationStructureFromPattern( \
@@ -31,6 +35,10 @@ baseline.createSimulationStructureFromPattern( \
     ,[] \
     , range(0,10))
 simDatas.append(baseline)
+datas.append(baseline)
+timePoints.append(-1)
+timePointsPrettyNames.append("Baseline")
+lineColors.append("tab:blue")
 
 baselineSleep = SimData(figureFolderPath="../figures/" )
 baselineSleep.createSimulationStructureFromPattern( \
@@ -39,6 +47,10 @@ baselineSleep.createSimulationStructureFromPattern( \
     ,[] \
     , range(0,10))
 simDatas.append(baselineSleep)
+datas.append(baselineSleep)
+timePoints.append(-1)
+timePointsPrettyNames.append("Baseline + SRC")
+lineColors.append("tab:gray")
 
 baselineSleepFff = SimData(figureFolderPath="../figures/" )
 baselineSleepFff.createSimulationStructureFromPattern( \
@@ -47,6 +59,10 @@ baselineSleepFff.createSimulationStructureFromPattern( \
     ,[] \
     , range(0,10))
 simDatas.append(baselineSleepFff)
+datas.append(baselineSleepFff)
+timePoints.append(-1)
+timePointsPrettyNames.append("Baseline + SRC + FFF")
+lineColors.append("tab:orange")
 
 # fineTuneAll = SimData(figureFolderPath="../figures/" )
 # fineTuneAll.createSimulationStructureFromPattern( \
@@ -55,6 +71,10 @@ simDatas.append(baselineSleepFff)
     # ,[] \
     # , range(0,10))
 # simDatas.append(fineTuneAll)
+# datas.append(fineTuneAll)
+# timePoints.append(-1)
+# timePointsPrettyNames.append("Baseline + FT All")
+# lineColors.append("tab:purple")
 
 fineTuneBlur = SimData(figureFolderPath="../figures/" )
 fineTuneBlur.createSimulationStructureFromPattern( \
@@ -63,6 +83,10 @@ fineTuneBlur.createSimulationStructureFromPattern( \
     ,[] \
     , range(0,10))
 simDatas.append(fineTuneBlur)
+datas.append(fineTuneBlur)
+timePoints.append(-1)
+timePointsPrettyNames.append("Baseline + FT Blur")
+lineColors.append("tab:brown")
 
 fineTuneGn = SimData(figureFolderPath="../figures/" )
 fineTuneGn.createSimulationStructureFromPattern( \
@@ -71,6 +95,10 @@ fineTuneGn.createSimulationStructureFromPattern( \
     ,[] \
     , range(0,10))
 simDatas.append(fineTuneGn)
+datas.append(fineTuneGn)
+timePoints.append(-1)
+timePointsPrettyNames.append("Baseline + FT GN")
+lineColors.append("tab:purple")
 
 fineTuneSp = SimData(figureFolderPath="../figures/" )
 fineTuneSp.createSimulationStructureFromPattern( \
@@ -79,6 +107,10 @@ fineTuneSp.createSimulationStructureFromPattern( \
     ,[] \
     , range(0,10))
 simDatas.append(fineTuneSp)
+datas.append(fineTuneSp)
+timePoints.append(-1)
+timePointsPrettyNames.append("Baseline + FT SP")
+lineColors.append("tab:pink")
 
 
 for s in simDatas:
@@ -177,12 +209,11 @@ for i,datasetNames in enumerate(dataGroups):
 # lineColors = ["k", "tab:blue", "tab:blue", "tab:orange", "tab:orange", "tab:green", "tab:green", "tab:red", "tab:red"]
 
 
-datas = [baseline, baselineSleep, baselineSleepFff, fineTuneAll, fineTuneBlur, fineTuneGn, fineTuneSp]
-timePoints = [-1, -1, -1, -1, -1, -1, -1]
-timePointsPrettyNames = ["Baseline", "Baseline + SRC", "Baseline + SRC + FFF", "Baseline + FT All", "Baseline + FT Blur", "Baseline + FT GN", "Baseline + FT SP"]
-# lineStyles = ["-", "--", "-", "--", "-", "--", "-", "--", "-"]
-lineColors = ["tab:blue", "tab:gray", "tab:orange", "tab:purple", "tab:brown", "tab:green", "tab:pink"]
-
+# datas = [baseline, baselineSleep, baselineSleepFff, fineTuneAll, fineTuneBlur, fineTuneGn, fineTuneSp]
+# timePoints = [-1, -1, -1, -1, -1, -1, -1]
+# timePointsPrettyNames = ["Baseline", "Baseline + SRC", "Baseline + SRC + FFF", "Baseline + FT All", "Baseline + FT Blur", "Baseline + FT GN", "Baseline + FT SP"]
+# # lineStyles = ["-", "--", "-", "--", "-", "--", "-", "--", "-"]
+# lineColors = ["tab:blue", "tab:gray", "tab:orange", "tab:purple", "tab:brown", "tab:green", "tab:pink"]
 
 
 for i,datasetNames1 in enumerate(dataGroups):
