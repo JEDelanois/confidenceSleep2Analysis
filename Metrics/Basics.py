@@ -52,6 +52,36 @@ def plotTrialMetrics(data, datsetNames=["task1TrainData"], metricNames=["confide
             plt.legend(leg, loc='center left', bbox_to_anchor=(1, 0.5))
             plt.tight_layout()
 
+def plotAvgSimMetrics(datas, datsetNames=["task1TrainData"], metricNames=["confidence"], prettyFileName=None, colors=['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple', 'tab:brown', 'tab:pink', 'tab:gray'], alpha=0.2):
+    c = 0
+    # leg =[] 
+    fig = plt.figure()
+    if prettyFileName is not None:
+        datas[0].addFigure(fig, prettyFileName)
+    else:
+        datas[0].addFigure(fig, "%s-%s-avgline.png" % (str(datsetNames), str(metricNames)))
+    for datasetName in datsetNames:
+        for metricName in metricNames:
+            for data in datas:
+                for s,sim in enumerate(data.sims):
+                    ys = []
+                    for trial in sim.trials:
+                        metric = trial.data.datasetMetrics[datasetName][metricName]
+                        xs = metric[:,0]
+                        ys.append(metric[:,1])
+
+                    ys = np.array(ys)
+                    means = np.mean(ys, axis=0)
+                    stds = np.std(ys, axis=0)
+                    plt.plot(xs,means, c=colors[c % len(colors)], label="%s-%s-%s-%s" % (data.title, sim.title, datasetName, metricName))
+                    plt.fill_between(xs, means+stds, means-stds, color=colors[c % len(colors)], alpha=alpha)
+                    # leg.append("%s-%s-%s-%s" % (data.title, sim.title, datasetName, metricName))
+                    c += 1
+
+    # plt.legend(leg, loc='center left', bbox_to_anchor=(1, 0.5))
+    plt.legend()
+    plt.tight_layout()
+
 def plotTrialMetricsDiff(data, datsetNames=["task1TrainData"], metricNames=["confidence"], initialPoint=0, finalPoint=1, prettyFileName=None):
     for sim in data.sims:
         for trial in sim.trials:

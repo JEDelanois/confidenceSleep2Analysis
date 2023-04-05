@@ -115,11 +115,12 @@ class Simulation:
         self.__figures.saveFigures()        
 
 class SimData:
-    def __init__(self, figureFolderPath=None):
+    def __init__(self, figureFolderPath=None, title=""):
         self.sims = list()
         self.figureFolderPath = figureFolderPath
         self.__figures = FigureList()
         self.titlePattern = None
+        self.title = title
 
     def clearFigs(self):
         self.clearSimDataFigs()
