@@ -65,6 +65,7 @@ def plotConfidenceHistograms(data, datasetFolders=["task1Dataset"], plotIdxs=Non
                     incorrectSoftmaxValues = incorrectSoftmax[torch.arange(incorrectIdxs.size()[0]),incorrectPred].numpy()
                     axs[1].hist(incorrectSoftmaxValues)
                     axs[1].set_title("Incorrect confidence distribution\n%d" % (incorrectSoftmaxValues.shape[0]))
+                    plt.tight_layout()
 
 
 
