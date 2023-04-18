@@ -4,6 +4,8 @@ import os
 import torch
 import torch.nn as nn
 import numpy as np
+from Confidence.ExpectedCalibrationError import *
+
 
 def argmax_first_and_last(a):
     b = torch.stack([torch.arange(a.shape[1])] * a.shape[0])
@@ -67,6 +69,19 @@ def plotConfidenceHistograms(data, datasetFolders=["task1Dataset"], plotIdxs=Non
                     axs[1].set_title("Incorrect confidence distribution\n%d" % (incorrectSoftmaxValues.shape[0]))
                     plt.tight_layout()
 
+def plotECE(data, datasetFolders=["task1Dataset"], plotIdxs=None, onehotsize=1000):
+    for sim in data.sims:
+        for trial in sim.trials:
+            for datasetFolder in datasetFolders:
+                idxSet = range(len(trial.data.datasetConfs[datasetFolder])) if plotIdxs is None else plotIdxs
+                for i in idxSet:
+                    sm = nn.Softmax(dim=1)
+                    confData = trial.data.datasetConfs[datasetFolder][i]
+                    torchNetowrkOutput = torch.tensor(confData.networkOutput)
+                    softmaxOutput = sm(torchNetowrkOutput).numpy()
+                    labels = torch.tensor(confData.labels)
+                    labels = torch.nn.functional.one_hot(labels, num_classes=onehotsize).float().numpy()
+                    getEceMceFromPreds(None, softmaxOutput, labels, "%s/figures/%s/ece-epoch%d.png" % (trial.path, datasetFolder, confData.epoch))
 
 
 
